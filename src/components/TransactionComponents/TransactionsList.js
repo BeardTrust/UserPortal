@@ -166,7 +166,7 @@ function TransactionsList(props) {
                 <div className={'mt-5'}>
                     <div>
                         <div className={'input-group mb-3'}>
-                            <div className={'me-5 col-xs-12 col-lg-2'}>
+                            <div className={'me-5 col-xs-12 col-lg-4'}>
                             <span className={'align-middle'}>
                                 {'Items per Page: '}
                             </span>
@@ -178,7 +178,7 @@ function TransactionsList(props) {
                                     ))}
                                 </select>
                             </div>
-                            <span className={'text-center col-sm-0 col-md-4 col-lg-6'}/>
+                            <span className={'text-center col-sm-0 col-md-4 col-lg-2'}/>
                             <input id={'searchBar'} type={'text'} className={'form-control'} placeholder={'Search'}
                                    value={searchCriteria}
                                    onChange={handleSearchCriteriaChange}/>

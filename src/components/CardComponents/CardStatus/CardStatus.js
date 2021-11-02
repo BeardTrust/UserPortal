@@ -66,7 +66,7 @@ function CardStatus(){
         <section className={'container'}>
             {errorMessage && <div className={'alert-danger mt-5'}>{errorMessage}</div>}
             <Centerpiece content={
-                {
+                {                                                                                                                                                                                                                                                                                                               
                     title: cardStatus?.nickname + '   ...' + cardStatus?.cardNumber?.slice(15,19),
                     lead: 'Current Balance: $' + cardStatus?.balance?.dollars + '.' + (cardStatus?.balance?.cents > 10 ?
                         cardStatus?.balance?.cents : '0' + cardStatus?.balance?.cents),
