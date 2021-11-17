@@ -38,6 +38,7 @@ function CardStatus(props) {
     const url = 'http://localhost:9001/cards/' + userId + '/' + cardId;
 
     async function getAccounts() {
+        setCurrentCard(props.card);
         console.log('get accounts')
         if (!pay) {
             const list = await axios.get("http://localhost:9001/accounts/me", {
@@ -221,7 +222,7 @@ function CardStatus(props) {
                 </div>
                 {pay === true &&
                 // <PaymentCluster object={props.card} endpoint={'/cards/' + userId + '/' + props.card.id}/>
-                        <div class="input-group mb-2">
+                        <div classNam="input-group mb-2">
                             <label id="paySourceLabel" className="input-group-text mb-2">Source Account:</label>
                             <Dropdown onSelect={function (evt) { dropHandler(evt) }} required>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic" data-toggle="dropdown">
@@ -231,12 +232,12 @@ function CardStatus(props) {
                                     {availableAccounts.map((account, index) => (
                                         <Dropdown.Item eventKey={index}>{account.nickname}: {CurrencyValue.from(account.balance).toString()}</Dropdown.Item>
                                     ))}
-                                    <div role="separator" class="dropdown-divider"></div>
+                                    <div role="separator" className="dropdown-divider"></div>
                                     <Dropdown.Item disabled="true">Select an account to make a payment from</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             {maxPayment !== null &&
-                                <div class="input-group mb-2">
+                                <div className="input-group mb-2">
                                     <label id="paymentAmountDateLabel" className="input-group-text">Payment Amount:</label>
                                     <label id="PayDollarSignLabel" className="input-group-text">$</label>
                                     <input className="form-control" type="number" step="0.01" min="0" max={maxPayment} ref={enteredValue} ></input>
@@ -244,6 +245,9 @@ function CardStatus(props) {
                             }
                         </div>
                     }
+                    <div className="input-Group">
+                    <label className="input-group-text" >Transactions related to this Card</label>
+                </div>
                         <TransactionsList url={'http://localhost:9001/transactions/cards'} object={props.card.id} search={props.card.id} />
             </Modal.Body>
             <Modal.Footer>

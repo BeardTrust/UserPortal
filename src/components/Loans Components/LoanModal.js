@@ -154,7 +154,7 @@ function LoanModal(props) {
             console.log('account payment response: ', res)
             console.log('loan payment response: ', res2)
         }
-        window.location.reload();
+        // window.location.reload();
     }
 
     return (
@@ -228,7 +228,7 @@ function LoanModal(props) {
                         }
                 </div>
                 <div className="input-Group">
-                    <label className="input-group-text" >Transaction Features Coming Soon</label>
+                    <label className="input-group-text" >Transactions related to this Loan</label>
                 </div>
                 <TransactionsList url={'http://localhost:9001/transactions/' + props.loan.id} loan={props.loan} search={props.loan.id} />
             </Modal.Body>

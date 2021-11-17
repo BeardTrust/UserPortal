@@ -160,10 +160,19 @@ const DefaultTable = (props) => {
             title.sorting = true;
             titles[event.target.id].active = true;
             field = toggleDirection(title);
+            let sortingCount = 0
+            let commas = 0;
+            for (let j = 0; j < titles.length; j++) {
+               if (titles[j].sorting) {
+                   sortingCount++;
+               }                
+            }
+            console.log('sorting count: ', sortingCount)
             for (let i = 0; i < titles.length; i++) {
                 if (titles[i].sorting) {
                     sort += titles[i].id + ',' + titles[i].direction;
-                    if (i < titles.length - 1 && titles[i + 1].sorting) {
+                    if (commas < sortingCount - 1) {
+                        commas++;
                         sort += ',';
                     }
                 }

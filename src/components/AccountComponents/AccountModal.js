@@ -45,7 +45,7 @@ function AccountModal(props) {
                     </div>
                 </div>
                 <div className="input-Group">
-                    <label className="input-group-text" >Transaction Features Coming Soon</label>
+                    <label className="input-group-text" >Transactions related to this Account</label>
                 </div>
                 <TransactionsList url={'http://localhost:9001/transactions/' + props.account.id} search={props.account.id} />
             </Modal.Body>
