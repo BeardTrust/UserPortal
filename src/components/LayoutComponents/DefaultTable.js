@@ -377,7 +377,7 @@ const DefaultTable = (props) => {
                             <Modal show={show} onHide={handleClose} contentClassName="modal-style">
                                 <Modal.Header closeButton>
                                     <Modal.Title>
-                                        Your {currentObject.typeName} Loan:
+                                        Your {currentObject.loanType.typeName} Loan:
                                     </Modal.Title>
                                 </Modal.Header>
                                 <LoanModal loan={currentObject} />

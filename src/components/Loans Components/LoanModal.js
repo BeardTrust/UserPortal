@@ -185,17 +185,17 @@ function LoanModal(props) {
                     </div>
                     <div className="input-group mb-2">
                         <label id="principalLabel" className="input-group-text">Normal Minimum Payment:</label>
-                        <input id="principalText" className="form-control" type="text" disabled={true} value={props.loan.minMonthFee}></input>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={props.loan.payment.minMonthFee}></input>
                     </div>
                     <div className="input-group mb-2">
                         <label id="principalLabel" className="input-group-text">Current Minimum Owed:</label>
-                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.minDue).toString()}></input>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.payment.minDue).toString()}></input>
                     </div>
                     <div className="input-group mb-2">
                     </div>
                     <div className="input-group mb-2">
                         <label id="nextDueDateLabel" className="input-group-text">Next Payment Due Date:</label>
-                        <input id="nextDueDateText" className="form-control" type="text" disabled={true} value={props.loan.nextDueDate.slice(8, 10) + '/' + props.loan.nextDueDate.slice(5, 7) + '/' + props.loan.nextDueDate.slice(0, 4)}></input>
+                        <input id="nextDueDateText" className="form-control" type="text" disabled={true} value={props.loan.payment.nextDueDate.slice(8, 10) + '/' + props.loan.payment.nextDueDate.slice(5, 7) + '/' + props.loan.payment.nextDueDate.slice(0, 4)}></input>
                     </div>
                     <div className="input-group mb-2">
                         <label id="createDateLabel" className="input-group-text">Date Created:</label>
