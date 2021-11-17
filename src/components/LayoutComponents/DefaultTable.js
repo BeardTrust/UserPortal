@@ -264,10 +264,10 @@ const DefaultTable = (props) => {
                                     {titles[2].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
                                     {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].principal).toString()}</td>}
                                     {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
-                                    {titles[5].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].nextDueDate.slice(8, 10) + '/' + availableObjects.content[i].nextDueDate.slice(5, 7) + '/' + availableObjects.content[i].nextDueDate.slice(0, 4)}</td>}
-                                    {titles[6].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>}
-                                    {titles[7].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].minDue).toString()}</td>}
-                                    {titles[8].maxWidth < width &&  <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].lateFee).toString()}</td>}
+                                    {titles[5].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].payment.nextDueDate.slice(8, 10) + '/' + availableObjects.content[i].payment.nextDueDate.slice(5, 7) + '/' + availableObjects.content[i].payment.nextDueDate.slice(0, 4)}</td>}
+                                    {titles[6].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].payment.hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>}
+                                    {titles[7].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.minDue).toString()}</td>}
+                                    {titles[8].maxWidth < width &&  <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.lateFee).toString()}</td>}
                                     {titles[9].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
                                     <td className={'align-middle text-center'}>
                                         <button className={'btn btn-primary btn mx-3'}
