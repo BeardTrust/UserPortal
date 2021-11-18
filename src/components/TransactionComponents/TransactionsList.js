@@ -173,21 +173,21 @@ function TransactionsList(props) {
                 <div className={'mt-5'}>
                     <div>
                         <div className={'input-group mb-3'}>
-                                <label className={'input-group-text'}>
-                                    {'Items per Page: '}
-                                </label>
-                                <select data-testid={'pageSizeSelector'} className={'text-center align-middle'} onChange={handlePageSizeChange}
-                                    value={pageSize}>
-                                    {pageSizes.map((size) => (
-                                        <option key={size} value={size}>{size}</option>
-                                    ))}
-                                </select>
-                                <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
-                                <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
-                                    onChange={handleSearchCriteriaChange} title="Search" />
-                                <button className={'btn btn-outline-secondary'} type={'button'} onClick={handleSearchClicked}
-                                    id={'searchBar'}><FcSearch />Search
-                                </button>
+                            <label className={'input-group-text'}>
+                                {'Items per Page: '}
+                            </label>
+                            <select data-testid={'pageSizeSelector'} className={'text-center align-middle'} onChange={handlePageSizeChange}
+                                value={pageSize}>
+                                {pageSizes.map((size) => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </select>
+                            <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
+                            <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
+                                onChange={handleSearchCriteriaChange} title="Search" />
+                            <button className={'btn btn-outline-secondary'} type={'button'} onClick={handleSearchClicked}
+                                id={'searchBar'}><FcSearch />Search
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -235,6 +235,11 @@ function TransactionsList(props) {
                             ))}
                         </tbody>
                     </Table>
+                    {transactions === undefined &&
+                        <div className="input-Group">
+                            <label className="input-group-text" >Transactions loading...</label>
+                        </div>
+                    }
                 </div>
                 <Pagination className={'my-3'} count={numberOfPages} page={currentPage} siblingCount={1}
                     boundaryCount={1} onChange={handlePageChange} />

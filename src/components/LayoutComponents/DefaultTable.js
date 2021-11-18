@@ -40,6 +40,7 @@ const DefaultTable = (props) => {
     const { width } = useWindowDimensions();
     const [isMobile, setIsMobile] = useState(false)
     const [titles, setTitles] = useState(props.headers)
+    console.log('available objects start as: ', availableObjects)
 
     function checkMobile() {
         if (width < 1050) {
@@ -163,9 +164,9 @@ const DefaultTable = (props) => {
             let sortingCount = 0
             let commas = 0;
             for (let j = 0; j < titles.length; j++) {
-               if (titles[j].sorting) {
-                   sortingCount++;
-               }                
+                if (titles[j].sorting) {
+                    sortingCount++;
+                }
             }
             console.log('sorting count: ', sortingCount)
             for (let i = 0; i < titles.length; i++) {
@@ -224,16 +225,16 @@ const DefaultTable = (props) => {
 
     function titleBuilder() {
         const outTitles = []
-        const title = [] 
+        const title = []
         for (let i = 0; i < titles.length; i++) {
             if (titles[i].maxWidth < width) {
                 title.push(
                     <th style={Style} className={'align-middle text-center'} data-sortable={'true'}
-                                    scope={'col'} onClick={addToSort} name={title.id}
-                                    id={titles[i].sequence}>{titles[i].title}<br></br>{titles[i].active === true && (titles[i].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
+                        scope={'col'} onClick={addToSort} name={title.id}
+                        id={titles[i].sequence}>{titles[i].title}<br></br>{titles[i].active === true && (titles[i].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
                 )
             }
-        }title.push(<th style={Style} className={'align-middle text-center'}>Details</th>)
+        } title.push(<th style={Style} className={'align-middle text-center'}>Details</th>)
         outTitles.push(<tr>{title}</tr>)
         return outTitles
     }
@@ -245,67 +246,67 @@ const DefaultTable = (props) => {
             switch (pageTitle) {
                 case 'Your Accounts':
                     for (let i = 0; i < availableObjects.content.length; i++) {
-                            row.push(
-                                <tr>
-                                    {titles[0].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>}
-                                    {titles[1].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>}
-                                    {titles[2].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>}
-                                    {titles[3].maxWidth < width && <td className={'align-middle text-center'} >{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
-                                    {titles[4].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.description}</td>}
-                                    {titles[5].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
-                                    <td className={'align-middle text-center'}>
-                                        <button className={'btn btn-primary btn mx-3'}
-                                            onClick={() => openModal(availableObjects.content[i])}
-                                            id={'reviewBtn'}><GiMoneyStack />
-                                            Review
-                                        </button>
-                                    </td>
-                                </tr>)
+                        row.push(
+                            <tr>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'} >{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.description}</td>}
+                                {titles[5].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
+                                <td className={'align-middle text-center'}>
+                                    <button className={'btn btn-primary btn mx-3'}
+                                        onClick={() => openModal(availableObjects.content[i])}
+                                        id={'reviewBtn'}><GiMoneyStack />
+                                        Review
+                                    </button>
+                                </td>
+                            </tr>)
                     }
                     rows.push(<tbody>{row}</tbody>)
                     return rows;
                 case 'Your Loans':
                     for (let i = 0; i < availableObjects.content.length; i++) {
-                            row.push(
-                                <tr>
-                                    {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>}
-                                    {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>}
-                                    {titles[2].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
-                                    {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].principal).toString()}</td>}
-                                    {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
-                                    {titles[5].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].payment.nextDueDate.slice(8, 10) + '/' + availableObjects.content[i].payment.nextDueDate.slice(5, 7) + '/' + availableObjects.content[i].payment.nextDueDate.slice(0, 4)}</td>}
-                                    {titles[6].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].payment.hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>}
-                                    {titles[7].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.minDue).toString()}</td>}
-                                    {titles[8].maxWidth < width &&  <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.lateFee).toString()}</td>}
-                                    {titles[9].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
-                                    <td className={'align-middle text-center'}>
-                                        <button className={'btn btn-primary btn mx-3'}
-                                            onClick={() => openModal(availableObjects.content[i])}
-                                            id={'reviewBtn'}><FcMoneyTransfer />
-                                            Review
-                                        </button>
-                                    </td>
-                                </tr>)
+                        row.push(
+                            <tr>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].principal).toString()}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
+                                {titles[5].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].payment.nextDueDate.slice(8, 10) + '/' + availableObjects.content[i].payment.nextDueDate.slice(5, 7) + '/' + availableObjects.content[i].payment.nextDueDate.slice(0, 4)}</td>}
+                                {titles[6].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].payment.hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>}
+                                {titles[7].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.minDue).toString()}</td>}
+                                {titles[8].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.lateFee).toString()}</td>}
+                                {titles[9].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
+                                <td className={'align-middle text-center'}>
+                                    <button className={'btn btn-primary btn mx-3'}
+                                        onClick={() => openModal(availableObjects.content[i])}
+                                        id={'reviewBtn'}><FcMoneyTransfer />
+                                        Review
+                                    </button>
+                                </td>
+                            </tr>)
                     }
                     rows.push(<tbody>{row}</tbody>)
                     return rows;
                 case 'Your Cards':
                     for (let i = 0; i < availableObjects.content.length; i++) {
-                            row.push(
-                                <tr>
-                                    {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>}
-                                    {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>}
-                                    {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>}
-                                    {titles[3].maxWidth < width &&  <td className={'align-middle text-center'}>{availableObjects.content[i].expireDate.slice(5, 7) + '/' + availableObjects.content[i].expireDate.slice(2, 4)}</td>}
-                                    {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].cardType.typeName}</td>}
-                                    <td className={'align-middle text-center'}>
-                                        <button className={'btn btn-primary btn mx-3'}
-                                            onClick={() => openModal(availableObjects.content[i])}
-                                            id={'reviewBtn'}><FcSimCardChip /> <br />
-                                            View
-                                        </button>
-                                    </td>
-                                </tr>)
+                        row.push(
+                            <tr>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].expireDate.slice(5, 7) + '/' + availableObjects.content[i].expireDate.slice(2, 4)}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].cardType.typeName}</td>}
+                                <td className={'align-middle text-center'}>
+                                    <button className={'btn btn-primary btn mx-3'}
+                                        onClick={() => openModal(availableObjects.content[i])}
+                                        id={'reviewBtn'}><FcSimCardChip /> <br />
+                                        View
+                                    </button>
+                                </td>
+                            </tr>)
                     }
                     rows.push(<tbody>{row}</tbody>)
                     return rows;
@@ -424,6 +425,11 @@ const DefaultTable = (props) => {
                                 <LoanOfferModal history={props.history} applyLoan={currentObject} /></Modal>
                         </>}
                 </Table>
+                {availableObjects.length === 0 &&
+                    <div className="input-Group">
+                        <label className="input-group-text" >Please wait while we retrieve your data...</label>
+                    </div>
+                }
                 {errorPresent === true &&
                     <div className={'alert-danger mt-5'}>
                         <p>There was an error getting your data. There may be any number of reasons for this and it is likely not your fault. Please contact customer support for more information.</p>

@@ -219,7 +219,6 @@ function CardStatus(props) {
                     </div>
                 </div>
                 {pay === true &&
-                    // <PaymentCluster object={props.card} endpoint={'/cards/' + userId + '/' + props.card.id}/>
                     <div classNam="input-group mb-2">
                         <label id="paySourceLabel" className="input-group-text mb-2">Source Account:</label>
                         <Dropdown onSelect={function (evt) { dropHandler(evt) }} required>
@@ -243,9 +242,6 @@ function CardStatus(props) {
                         }
                     </div>
                 }
-                <div className="input-Group">
-                    <label className="input-group-text" >Transactions related to this Card</label>
-                </div>
                 <TransactionsList object={props.card.id} assetId={props.card.id} />
             </Modal.Body>
             <Modal.Footer>
