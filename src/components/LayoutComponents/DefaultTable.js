@@ -8,9 +8,12 @@ import { CurrencyValue } from "../../models/currencyvalue.model";
 import AccountModal from "../AccountComponents/AccountModal";
 import LoanModal from "../Loans Components/LoanModal";
 import LoanOfferModal from "../Loans Components/LoanOfferModal";
-import { FcAlphabeticalSortingAz, FcAlphabeticalSortingZa, FcRefresh, FcSearch, FcMoneyTransfer, FcCurrencyExchange } from "react-icons/fc"
-import { GiMoneyStack, GiSwipeCard } from "react-icons/gi"
+import { FcAlphabeticalSortingAz, FcAlphabeticalSortingZa, FcRefresh, FcSearch, FcMoneyTransfer, FcCurrencyExchange, FcSimCardChip } from "react-icons/fc"
+import { GiMoneyStack } from "react-icons/gi"
 import Style from './style.css'
+import CardStatus from "../CardComponents/CardStatus/CardStatus";
+import useWindowDimensions from "./useWindowSize";
+
 
 const DefaultTable = (props) => {
     const authContext = useContext(AuthContext);
@@ -18,6 +21,9 @@ const DefaultTable = (props) => {
     const userId = authContext.userId;
     const url = props.url
     const pageTitle = props.title
+    const [errorPresent, setErrorPresent] = useState(false);
+    const [errorCode, setErrorCode] = useState();
+    const [errorTitle, setErrorTitle] = useState(props.errorTitle);
     const [availableObjects, setAvailableObjects] = useState([]);
     const [currentObject, setCurrentObject] = useState();
     const [numberOfPages, setNumberOfPages] = useState(5);
@@ -32,7 +38,20 @@ const DefaultTable = (props) => {
     const sortArry = [props.headers.size]
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
-    const titles = props.headers
+    const { width } = useWindowDimensions();
+    const [isMobile, setIsMobile] = useState(false)
+    const [titles, setTitles] = useState(props.headers)
+    console.log('available objects start as: ', availableObjects)
+
+    function checkMobile() {
+        if (width < 1050) {
+            console.log('is mobile')
+            setIsMobile(true);
+        }
+        else {
+            setIsMobile(false);
+        }
+    }
 
     function handlePageChange(event, value) {
         event.preventDefault();
@@ -86,32 +105,46 @@ const DefaultTable = (props) => {
 
         console.log('params: ', params);
         console.log('outbound url: ', url)
-        const list = await axios.get(url, {
+        const list = '';
+        await axios.get(url, {
             params: params,
             headers: {
                 'Authorization': token,
                 'Content-Type': 'application/json'
             }
-        });
+        })
+            .then(res => {
+                console.log('response: ', res)
+                if (res.data.content !== availableObjects) {
+                    console.log('list data found: ', res.data);
+                    if (searchCriteriaChanged) {
+                        setCurrentPage(1);
+                        setSearchCriteriaChanged(false);
+                    }
+                    setAvailableObjects(res.data);
+                    setObjectsDisplayed(true);
+                    setNumberOfPages(res.data.totalPages);
+                    setCurrentObject(availableObjects[0]);
+                }
+                if (errorPresent) {
+                    setErrorPresent(false)
+                }
+            })
+            .catch((e) => {
+                console.log('error: ', e.response)
+                setErrorCode(e.response.status)
+                    window.setTimeout(() => {
+                        window.location.reload();
+                    }, 5000)
+            })
         console.log("default outbound url: ", url);
-        console.log('inbound response: ', list);
-
-        if (list.data.content !== availableObjects) {
-            console.log('list data found: ', list.data);
-            if (searchCriteriaChanged) {
-                setCurrentPage(1);
-                setSearchCriteriaChanged(false);
-            }
-            setAvailableObjects(list.data);
-            setObjectsDisplayed(true);
-            setNumberOfPages(list.data.totalPages);
-            setCurrentObject(availableObjects[0]);
-        }
+        console.log('available objects: ', availableObjects);
     },
         [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, rows],
     )
 
     useEffect(() => {
+        checkMobile();
         if (!objectsDisplayed) {
             getList();
         }
@@ -127,9 +160,21 @@ const DefaultTable = (props) => {
             title.sorting = true;
             titles[event.target.id].active = true;
             field = toggleDirection(title);
+            let sortingCount = 0
+            let commas = 0;
+            for (let j = 0; j < titles.length; j++) {
+                if (titles[j].sorting) {
+                    sortingCount++;
+                }
+            }
+            console.log('sorting count: ', sortingCount)
             for (let i = 0; i < titles.length; i++) {
                 if (titles[i].sorting) {
-                    sort += titles[i].id + ',' + titles[i].direction + ',';
+                    sort += titles[i].id + ',' + titles[i].direction;
+                    if (commas < sortingCount - 1) {
+                        commas++;
+                        sort += ',';
+                    }
                 }
 
             }
@@ -177,6 +222,22 @@ const DefaultTable = (props) => {
         return field;
     }
 
+    function titleBuilder() {
+        const outTitles = []
+        const title = []
+        for (let i = 0; i < titles.length; i++) {
+            if (titles[i].maxWidth < width) {
+                title.push(
+                    <th style={Style} className={'align-middle text-center'} data-sortable={'true'}
+                        scope={'col'} onClick={addToSort} name={title.id}
+                        id={titles[i].sequence}>{titles[i].title}<br></br>{titles[i].active === true && (titles[i].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
+                )
+            }
+        } title.push(<th style={Style} className={'align-middle text-center'}>Details</th>)
+        outTitles.push(<tr>{title}</tr>)
+        return outTitles
+    }
+
     function typeSelector() {
         const rows = []
         const row = []
@@ -186,12 +247,12 @@ const DefaultTable = (props) => {
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
                             <tr>
-                                <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>
-                                <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>
-                                <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>
-                                <td className={'align-middle text-center'} >{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>
-                                <td className={'align-middle text-center'} >{availableObjects.content[i].type.description}</td>
-                                <td className={'align-middle text-center'} >{availableObjects.content[i].createDate}</td>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'} >{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.description}</td>}
+                                {titles[5].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
                                 <td className={'align-middle text-center'}>
                                     <button className={'btn btn-primary btn mx-3'}
                                         onClick={() => openModal(availableObjects.content[i])}
@@ -207,16 +268,16 @@ const DefaultTable = (props) => {
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
                             <tr>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>
-                                <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>
-                                <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].principal).toString()}</td>
-                                <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].nextDueDate}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>
-                                <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].minDue).toString()}</td>
-                                <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].lateFee).toString()}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].createDate}</td>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].principal).toString()}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].balance).toString()}</td>}
+                                {titles[5].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].payment.nextDueDate.slice(8, 10) + '/' + availableObjects.content[i].payment.nextDueDate.slice(5, 7) + '/' + availableObjects.content[i].payment.nextDueDate.slice(0, 4)}</td>}
+                                {titles[6].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].payment.hasPaid === true ? 'You\'ve paid!' : 'Yet to Pay.'}</td>}
+                                {titles[7].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.minDue).toString()}</td>}
+                                {titles[8].maxWidth < width && <td className={'align-middle text-center'}>{CurrencyValue.from(availableObjects.content[i].payment.lateFee).toString()}</td>}
+                                {titles[9].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].createDate.slice(8, 10) + '/' + availableObjects.content[i].createDate.slice(5, 7) + '/' + availableObjects.content[i].createDate.slice(0, 4)}</td>}
                                 <td className={'align-middle text-center'}>
                                     <button className={'btn btn-primary btn mx-3'}
                                         onClick={() => openModal(availableObjects.content[i])}
@@ -232,20 +293,17 @@ const DefaultTable = (props) => {
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
                             <tr>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>
-                                <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].expireDate.slice(5, 7) + '/' + availableObjects.content[i].expireDate.slice(2, 4)}</td>
-                                <td className={'align-middle text-center'}>{availableObjects.content[i].cardType.typeName}</td>
+                                {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>}
+                                {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>}
+                                {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>}
+                                {titles[3].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].expireDate.slice(5, 7) + '/' + availableObjects.content[i].expireDate.slice(2, 4)}</td>}
+                                {titles[4].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].cardType.typeName}</td>}
                                 <td className={'align-middle text-center'}>
-                                <Link to={'/cards/' + availableObjects.content[i].id}>
-                                    <Button
-                                        className={'btn-sm'}
-                                        variant={'success'}
-                                        type={'submit'}
-                                        id={'Review'}
-                                    >View</Button>
-                                </Link>
+                                    <button className={'btn btn-primary btn mx-3'}
+                                        onClick={() => openModal(availableObjects.content[i])}
+                                        id={'reviewBtn'}><FcSimCardChip /> <br />
+                                        View
+                                    </button>
                                 </td>
                             </tr>)
                     }
@@ -256,7 +314,7 @@ const DefaultTable = (props) => {
                         row.push(
                             <tr>
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].typeName}</td>
-                                <td className={'align-middle'}>{availableObjects.content[i].description}</td>
+                                {width > 900 && <td className={'align-middle'}>{availableObjects.content[i].description}</td>}
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].apr + '%'}</td>
                                 <td className={'align-middle text-center'}>
                                     <button className={'btn btn-primary btn mx-3'} onClick={() => openModal(availableObjects.content[i])}
@@ -269,11 +327,14 @@ const DefaultTable = (props) => {
                     return rows;
             }
         } catch (e) {
-            console.log('error: ', e)
-            return (<div><p>There was an error with your data. Please contact customer support for more information.</p></div>)
+            console.log('error: ', e);
+            if (!errorPresent && e.response !== undefined) {
+                setErrorPresent(true);
+            }
         }
 
     }
+
     return (
         <section style={Style} className={'container'}>
             <h1 className={'text-center mt-5'}>{pageTitle}</h1>
@@ -289,26 +350,32 @@ const DefaultTable = (props) => {
                         ))}
                     </select>
                 </div>
-                <span className={'text-center col-sm-0 col-md-4 col-lg-6'} />
-                <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
-                <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
-                    onChange={handleSearchCriteriaChange} title="Search" />
-                <button className={'btn btn-outline-secondary'} type={'button'} onClick={getList}
-                    id={'searchBar'}><FcSearch />Search
-                </button>
+                {isMobile === false && <>
+                    <span className={'text-center col-sm-0 col-md-4 col-lg-6'} />
+                    <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
+                    <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
+                        onChange={handleSearchCriteriaChange} title="Search" />
+                    <button className={'btn btn-outline-secondary'} type={'button'} onClick={getList}
+                        id={'searchBar'}><FcSearch />Search
+                    </button></>}
             </div>
+            {isMobile === true &&
+                <div className='input-group'>
+                    <span className={'text-center col-sm-0 col-md-4 col-lg-6'} />
+                    <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
+                    <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
+                        onChange={handleSearchCriteriaChange} title="Search" />
+                    <button className={'btn btn-outline-secondary'} type={'button'} onClick={getList}
+                        id={'searchBar'}><FcSearch />Search
+                    </button>
+                </div>}
             <div className={'mt-5'}>
                 <Table striped bordered hover className={'me-3 table-responsive'} data-sortable={'true'}
                     data-toggle={'table'} id={'table'}>
                     <thead>
-                        <tr>
-                            {titles && titles.map(title => (
-                                <th style={Style} className={'align-middle text-center'} data-sortable={'true'}
-                                    scope={'col'} onClick={addToSort} name={title.id}
-                                    id={title.sequence}>{title.title}<br></br>{titles[title.sequence].active === true && (titles[title.sequence].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
-                            ))}
-                            <th className={'align-middle text-center'}>Details</th>
-                        </tr>
+                        {
+                            titleBuilder()
+                        }
                     </thead>
                     {
                         typeSelector()
@@ -319,10 +386,21 @@ const DefaultTable = (props) => {
                             <Modal show={show} onHide={handleClose} contentClassName="modal-style">
                                 <Modal.Header closeButton>
                                     <Modal.Title>
-                                        Your {currentObject.typeName} Loan:
+                                        Your {currentObject.loanType.typeName} Loan:
                                     </Modal.Title>
                                 </Modal.Header>
                                 <LoanModal loan={currentObject} />
+                            </Modal>
+                        </>}
+                    {show === true && pageTitle === 'Your Cards' &&
+                        <>
+                            <Modal style={Style} show={show} onHide={handleClose} contentClassName="modal-style">
+                                <Modal.Header closeButton>
+                                    <Modal.Title>
+                                        Your {currentObject.typeName} Card:
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <CardStatus card={currentObject} />
                             </Modal>
                         </>}
                     {show === true && pageTitle === 'Your Accounts' &&
@@ -346,6 +424,29 @@ const DefaultTable = (props) => {
                                 <LoanOfferModal history={props.history} applyLoan={currentObject} /></Modal>
                         </>}
                 </Table>
+                {availableObjects.length === 0 && errorPresent === false &&
+                    <div className="input-Group">
+                        <label className="input-group-text" >Please wait while we retrieve your data...</label>
+                    </div>
+                }
+                {errorPresent === true &&
+                    <div className={'alert-danger mt-5'}>
+                        <p>There was an error getting your data. There may be any number of reasons for this and it is likely not your fault. Please contact customer support for more information.
+                        </p>
+                        <p>[{errorCode} ERROR: {errorTitle}]
+                        </p>
+                        {errorCode === 503 &&
+                            <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted.</p>
+                            }
+                            {errorCode === (404 || 405) &&
+                            <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
+                            }
+                            {errorCode === 403 &&
+                            <p>A 403 error indicates a permissions issue. In all likelihood, you just need to re-login to re-authenticate yourself.</p>
+                            }
+                            <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
+                    </div>
+                }
                 <Pagination className={'my-3'} count={numberOfPages} page={currentPage} siblingCount={1}
                     boundaryCount={1} onChange={handlePageChange} />
             </div>
