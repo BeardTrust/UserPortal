@@ -22,6 +22,7 @@ const DefaultTable = (props) => {
     const url = props.url
     const pageTitle = props.title
     const [errorPresent, setErrorPresent] = useState(false);
+    const [errorCode, setErrorCode] = useState();
     const [errorTitle, setErrorTitle] = useState(props.errorTitle);
     const [availableObjects, setAvailableObjects] = useState([]);
     const [currentObject, setCurrentObject] = useState();
@@ -131,9 +132,9 @@ const DefaultTable = (props) => {
             })
             .catch((e) => {
                 console.log('error: ', e.response)
+                setErrorCode(e.response.status)
                 if (e.response !== undefined && e.response.status === 503) {
                     window.setTimeout(() => {
-                        window.alert('[503 ERROR: ' + errorTitle + '] \nEither our servers are down or your connection was interrupted. The page will refresh until connection is established.')
                         window.location.reload();
                     }, 5000)
                 }
@@ -329,7 +330,7 @@ const DefaultTable = (props) => {
             }
         } catch (e) {
             console.log('error: ', e);
-            if (!errorPresent) {
+            if (!errorPresent && e.response !== undefined) {
                 setErrorPresent(true);
             }
         }
@@ -425,14 +426,27 @@ const DefaultTable = (props) => {
                                 <LoanOfferModal history={props.history} applyLoan={currentObject} /></Modal>
                         </>}
                 </Table>
-                {availableObjects.length === 0 &&
+                {availableObjects.length === 0 && errorPresent === false &&
                     <div className="input-Group">
                         <label className="input-group-text" >Please wait while we retrieve your data...</label>
                     </div>
                 }
                 {errorPresent === true &&
                     <div className={'alert-danger mt-5'}>
-                        <p>There was an error getting your data. There may be any number of reasons for this and it is likely not your fault. Please contact customer support for more information.</p>
+                        <p>There was an error getting your data. There may be any number of reasons for this and it is likely not your fault. Please contact customer support for more information.
+                        </p>
+                        <p>[{errorCode} ERROR: {errorTitle}]
+                        </p>
+                        {errorCode === 503 &&
+                            <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted. The page will refresh until connection is established.</p>
+                            }
+                            {errorCode === (404 || 405) &&
+                            <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
+                            }
+                            {errorCode === 403 &&
+                            <p>A 403 error indicates a permissions issue. In all likelihood, you just need to re-login to re-authenticate yourself.</p>
+                            }
+                            <p>If this issue persists, please contact BeardTrust customer service.</p>
                     </div>
                 }
                 <Pagination className={'my-3'} count={numberOfPages} page={currentPage} siblingCount={1}
