@@ -133,11 +133,9 @@ const DefaultTable = (props) => {
             .catch((e) => {
                 console.log('error: ', e.response)
                 setErrorCode(e.response.status)
-                if (e.response !== undefined && e.response.status === 503) {
                     window.setTimeout(() => {
                         window.location.reload();
                     }, 5000)
-                }
             })
         console.log("default outbound url: ", url);
         console.log('available objects: ', availableObjects);
@@ -438,7 +436,7 @@ const DefaultTable = (props) => {
                         <p>[{errorCode} ERROR: {errorTitle}]
                         </p>
                         {errorCode === 503 &&
-                            <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted. The page will refresh until connection is established.</p>
+                            <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted.</p>
                             }
                             {errorCode === (404 || 405) &&
                             <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
@@ -446,7 +444,7 @@ const DefaultTable = (props) => {
                             {errorCode === 403 &&
                             <p>A 403 error indicates a permissions issue. In all likelihood, you just need to re-login to re-authenticate yourself.</p>
                             }
-                            <p>If this issue persists, please contact BeardTrust customer service.</p>
+                            <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
                     </div>
                 }
                 <Pagination className={'my-3'} count={numberOfPages} page={currentPage} siblingCount={1}
