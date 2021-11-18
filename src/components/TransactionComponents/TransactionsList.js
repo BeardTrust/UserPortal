@@ -182,7 +182,6 @@ function TransactionsList(props) {
                                         <option key={size} value={size}>{size}</option>
                                     ))}
                                 </select>
-                                {/* <span className={'text-center col-sm-0 col-md-4 col-lg-6'} /> */}
                                 <button className={'btn btn-outline-secondary'} type="submit" id="reset" title="Reset Sort" onClick={resetSearch}><FcRefresh /></button>
                                 <input type={'text'} className={'form-control'} placeholder={'Search'} value={searchCriteria}
                                     onChange={handleSearchCriteriaChange} title="Search" />
