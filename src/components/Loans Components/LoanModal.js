@@ -5,25 +5,28 @@ import { CurrencyValue } from "../../models/currencyvalue.model";
 import axios from "axios";
 import AuthContext from "../../store/auth-context";
 import { GiPayMoney } from "react-icons/gi"
+import TransactionsList from "../TransactionComponents/TransactionsList";
+import { LoanTransactionModel } from "../../models/loanTransactionModel";
+import PaymentCluster from "../TransactionComponents/PaymentCluster";
 
 function LoanModal(props) {
     const authContext = useContext(AuthContext);
     const token = authContext.token;
     const userId = authContext.userId;
     const enteredValue = useRef();
-    const [maxPayment, setMaxPayment] = useState(1000);
+    const [maxPayment, setMaxPayment] = useState(null);
     const [availableAccounts, setAvailableAccounts] = useState([]);
     const [typeTitle, setTitle] = useState("Select Payment Account");
     const [pay, setPay] = useState(false);
     const [currentLoan, setCurrentLoan] = useState();
     const [paymentAccount, setPaymentAccount] = useState();
     const handleClosePayment = () => setPay(false);
-    console.log('loan modal reached with: ', props.loan);
+    // console.log('loan modal reached with: ', props.loan);
 
     useEffect(() => {
+        setCurrentLoan(props.loan);
         if (availableAccounts.length === 0) {
             getAccounts();
-            setCurrentLoan(props.loan);
         }
 
     }, [pay, availableAccounts, currentLoan, paymentAccount]);
@@ -63,6 +66,21 @@ function LoanModal(props) {
         setTitle(availableAccounts[dropInput].nickname + ': ' + CurrencyValue.from(availableAccounts[dropInput].balance).toString())
         console.log('payment account set to: ', paymentAccount)
         console.log('max payment set: ', maxPayment)
+    }
+
+    async function processTransaction(type, amount) {
+        const t = new LoanTransactionModel('', type, 'LOAN', amount, 'PENDING', paymentAccount.id, currentLoan.id, Date.now(), "A transaction from account " + paymentAccount.nickname + " to your " + currentLoan.loanType.typeName + " loan with an amount of " + amount)
+        console.log('transaction made: ', t)
+        const res = await axios.post(('http://localhost:9001/transactions'),
+            t,
+            {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+        console.log('transaction response: ', res)
     }
 
     async function makePayment(event) {
@@ -113,6 +131,7 @@ function LoanModal(props) {
         console.log('confirm payment: ', confirmPayment)
         console.log('canPay: ', canPay)
         if (canPay && confirmPayment) {
+            processTransaction('PAYMENT', cv);
             console.log('canPay true')
             const res = await axios.post(('http://localhost:9001/accounts/' + userId + '/' + paymentAccount.id),
                 cv,
@@ -135,56 +154,56 @@ function LoanModal(props) {
             console.log('account payment response: ', res)
             console.log('loan payment response: ', res2)
         }
-        window.location.reload();
+        // window.location.reload();
     }
 
     return (
         <section>
             <Modal.Body>
                 <div className="form-group">
-                    <div className="mb-2">
-                        <label id="typeLabel" className="form-label">Type:</label>
+                    <div className="input-group mb-2">
+                        <label id="typeLabel" className="input-group-text">Type:</label>
                         <input id="typeText" type="text" disabled={true} className="form-control" value={props.loan.loanType.typeName}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="descriptionLabel" className="form-label">Description:</label>
-                        <p id="descriptionText" className="form-body">
+                    <div className="input-group mb-2">
+                        <span id="descriptionLabel" className="input-group-text">Description:</span>
+                        <textarea value={props.loan.loanType.description} id="descriptionText" className="form-control" aria-label="Description" disabled={true}>
                             {props.loan.loanType.description}
-                        </p>
+                        </textarea>
                     </div>
-                    <div className="mb-2">
-                        <label id="interestLabel" className="form-label">Interest:</label>
+                    <div className="input-group mb-2">
+                        <label id="interestLabel" className="input-group-text">Interest:</label>
                         <input id="interestText" className="form-control" type="text" disabled={true} value={props.loan.loanType.apr + '%'}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="amountLabel" className="form-label">Balance:</label>
+                    <div className="input-group mb-2">
+                        <label id="amountLabel" className="input-group-text">Balance:</label>
                         <input id="amountText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.balance).toString()}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="principalLabel" className="form-label">Principal:</label>
+                    <div className="input-group mb-2">
+                        <label id="principalLabel" className="input-group-text">Principal:</label>
                         <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.principal).toString()}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="principalLabel" className="form-label">Normal Minimum Payment:</label>
-                        <input id="principalText" className="form-control" type="text" disabled={true} value={props.loan.minMonthFee}></input>
+                    <div className="input-group mb-2">
+                        <label id="principalLabel" className="input-group-text">Normal Minimum Payment:</label>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={props.loan.payment.minMonthFee}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="principalLabel" className="form-label">Current Minimum Owed:</label>
-                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.minDue).toString()}></input>
+                    <div className="input-group mb-2">
+                        <label id="principalLabel" className="input-group-text">Current Minimum Owed:</label>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(props.loan.payment.minDue).toString()}></input>
                     </div>
-                    <div className="mb-2">
+                    <div className="input-group mb-2">
                     </div>
-                    <div className="mb-2">
-                        <label id="nextDueDateLabel" className="form-label">Next Payment Due Date:</label>
-                        <input id="nextDueDateText" className="form-control" type="text" disabled={true} value={props.loan.nextDueDate}></input>
+                    <div className="input-group mb-2">
+                        <label id="nextDueDateLabel" className="input-group-text">Next Payment Due Date:</label>
+                        <input id="nextDueDateText" className="form-control" type="text" disabled={true} value={props.loan.payment.nextDueDate.slice(8, 10) + '/' + props.loan.payment.nextDueDate.slice(5, 7) + '/' + props.loan.payment.nextDueDate.slice(0, 4)}></input>
                     </div>
-                    <div className="mb-2">
-                        <label id="createDateLabel" className="form-label">Date Created:</label>
-                        <input id="createDateText" className="form-control" type="text" disabled={true} value={props.loan.createDate}></input>
+                    <div className="input-group mb-2">
+                        <label id="createDateLabel" className="input-group-text">Date Created:</label>
+                        <input id="createDateText" className="form-control" type="text" disabled={true} value={props.loan.createDate.slice(8, 10) + '/' + props.loan.createDate.slice(5, 7) + '/' + props.loan.createDate.slice(0, 4)}></input>
                     </div>
                     {pay === true &&
-                        <div>
-                            <label id="createDateLabel" className="form-label">Source Account:</label>
+                        <div className="input-group mb-2">
+                            <label id="paySourceLabel" className="input-group-text mb-2">Source Account:</label>
                             <Dropdown onSelect={function (evt) { dropHandler(evt) }} required>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic" data-toggle="dropdown">
                                     {typeTitle}
@@ -193,16 +212,21 @@ function LoanModal(props) {
                                     {availableAccounts.map((account, index) => (
                                         <Dropdown.Item eventKey={index}>{account.nickname}: {CurrencyValue.from(account.balance).toString()}</Dropdown.Item>
                                     ))}
+                                    <div role="separator" className="dropdown-divider"></div>
+                                    <Dropdown.Item disabled="true">Select an account to make a payment from</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
                             {maxPayment !== null &&
-                                <div>
-                                    <label id="createDateLabel" className="form-label">Payment Amount:</label><br></br>
-                                    $<input type="number" step="0.01" min="0" max={maxPayment} ref={enteredValue} ></input>
+                                <div className="input-group mb-2">
+                                    <label id="paymentAmountDateLabel" className="input-group-text">Payment Amount:</label>
+                                    <label id="PayDollarSignLabel" className="input-group-text">$</label>
+                                    <input className="form-control" type="number" step="0.01" min="0" max={maxPayment} ref={enteredValue} ></input>
                                 </div>
                             }
-                        </div>}
+                        </div>
+                        }
                 </div>
+                <TransactionsList assetId={props.loan.id} loan={props.loan} search={props.loan.id} />
             </Modal.Body>
             <Modal.Footer>
                 {pay === true &&
@@ -216,7 +240,7 @@ function LoanModal(props) {
                     </Button>
                 } {pay === true && paymentAccount &&
                     <Button variant="primary" onClick={makePayment}>
-                        Confirm Payment <GiPayMoney/>
+                        Confirm Payment <GiPayMoney />
                     </Button>
                 }
             </Modal.Footer>
