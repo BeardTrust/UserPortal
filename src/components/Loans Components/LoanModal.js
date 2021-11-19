@@ -21,7 +21,7 @@ function LoanModal(props) {
     const [currentLoan, setCurrentLoan] = useState();
     const [paymentAccount, setPaymentAccount] = useState();
     const handleClosePayment = () => setPay(false);
-    // console.log('loan modal reached with: ', props.loan);
+    console.log('loan modal reached');
 
     useEffect(() => {
         setCurrentLoan(props.loan);
@@ -39,8 +39,9 @@ function LoanModal(props) {
 
     async function getAccounts() {
         console.log('get accounts')
+        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}` + '/me'
         if (!pay) {
-            const list = await axios.get("http://localhost:9001/accounts/me", {
+            const list = await axios.get(url, {
                 params: { userId: userId },
                 headers: {
                     'Authorization': token,
@@ -71,7 +72,8 @@ function LoanModal(props) {
     async function processTransaction(type, amount) {
         const t = new LoanTransactionModel('', type, 'LOAN', amount, 'PENDING', paymentAccount.id, currentLoan.id, Date.now(), "A transaction from account " + paymentAccount.nickname + " to your " + currentLoan.loanType.typeName + " loan with an amount of " + amount)
         console.log('transaction made: ', t)
-        const res = await axios.post(('http://localhost:9001/transactions'),
+        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}`
+        const res = await axios.post((url),
             t,
             {
                 headers: {
@@ -133,7 +135,7 @@ function LoanModal(props) {
         if (canPay && confirmPayment) {
             processTransaction('PAYMENT', cv);
             console.log('canPay true')
-            const res = await axios.post(('http://localhost:9001/accounts/' + userId + '/' + paymentAccount.id),
+            const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
                 {
                     headers: {
@@ -142,7 +144,7 @@ function LoanModal(props) {
                     }
                 }
             )
-            const res2 = await axios.post(('http://localhost:9001/loans/' + userId + '/' + currentLoan.id),
+            const res2 = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}/` + userId + '/' + currentLoan.id),
                 cv,
                 {
                     headers: {

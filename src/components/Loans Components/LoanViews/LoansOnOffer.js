@@ -1,7 +1,7 @@
 import DefaultTable from '../../LayoutComponents/DefaultTable';
 
 function LoansOnOffer() {
-    const url = 'http://localhost:9001/loantypes';
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE_TYPES}`;
     const headers = ['Type', 'Description', 'APR']
     const maxWidths = [0, 900, 0]
     const headerId = ['typeName', 'description',  'apr']

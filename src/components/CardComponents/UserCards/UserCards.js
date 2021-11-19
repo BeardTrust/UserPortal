@@ -17,7 +17,7 @@ function UserCards(){
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
     const token = authContext.token;
-    const url = 'http://localhost:9001/cards/' + userId + "/all";
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/` + userId + "/all";
     const [cardsList, setCardsList] = useState();
     const [cardsDisplayed, setCardsDisplayed] = useState(false);
     const pageSizes = [5, 10, 15, 20, 25, 50, 100];

@@ -24,7 +24,7 @@ function ViewUserForm() {
     const usernameRef = useRef();
     const dateOfBirthRef = useRef();
 
-    const url = 'http://localhost:9001/users/' + userId
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_USER_SERVICE}` + '/' + userId
 
     useEffect(() =>
         axios.get(

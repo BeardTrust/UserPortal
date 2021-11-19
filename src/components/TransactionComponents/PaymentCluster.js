@@ -22,7 +22,7 @@ function PaymentCluster(props) {
     async function getAccounts() {
         console.log('get accounts')
         if (!pay) {
-            const list = await axios.get("http://localhost:9001/accounts/me", {
+            const list = await axios.get(`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/me`, {
                 params: { userId: userId },
                 headers: {
                     'Authorization': token,
@@ -97,7 +97,7 @@ function PaymentCluster(props) {
         console.log('canPay: ', canPay)
         if (canPay && confirmPayment) {
             console.log('canPay true')
-            const res = await axios.post(('http://localhost:9001/accounts/' + userId + '/' + paymentAccount.id),
+            const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
                 {
                     headers: {
@@ -106,7 +106,7 @@ function PaymentCluster(props) {
                     }
                 }
             )
-            const res2 = await axios.post(('http://localhost:9001' + props.endpoint),
+            const res2 = await axios.post((`${process.env.REACT_APP_BASE_URL}` + props.endpoint),
                 cv,
                 {
                     headers: {

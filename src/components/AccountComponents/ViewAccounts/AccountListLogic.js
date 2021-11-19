@@ -11,7 +11,7 @@ function ViewAccount() {
     const token = authContext.token;
     const userId = authContext.userId;
 
-    const url = "http://localhost:9001/accounts"
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}`
 
         useEffect(() =>
             axios.get(
