@@ -131,11 +131,20 @@ const DefaultTable = (props) => {
                 }
             })
             .catch((e) => {
-                console.log('error: ', e.response)
-                setErrorCode(e.response.status)
-                    window.setTimeout(() => {
-                        window.location.reload();
-                    }, 5000)
+                if (e.response) {
+                    console.log('error with response: ', e.response)
+                    try {
+                    setErrorCode(e.response.status)
+                    setErrorPresent(true)
+                    } catch (e) {console.log('exception: ', e)}
+                        window.setTimeout(() => {
+                            window.location.reload();
+                        }, 5000)
+                    } else {
+                        console.log('error: ', e)
+                        setErrorCode('NETWORK')
+                        setErrorPresent(true)
+                    }
             })
         console.log("default outbound url: ", url);
         console.log('available objects: ', availableObjects);
