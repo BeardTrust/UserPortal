@@ -453,6 +453,9 @@ const DefaultTable = (props) => {
                             {errorCode === 403 &&
                             <p>A 403 error indicates a permissions issue. In all likelihood, you just need to re-login to re-authenticate yourself.</p>
                             }
+                            {errorCode === 'NETWORK' &&
+                            <p>A NETWORK error indicates the website couldn't get a response from the back-end in any way. Our servers are likely down.</p>
+                            }
                             <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
                     </div>
                 }
