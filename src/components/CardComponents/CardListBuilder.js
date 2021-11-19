@@ -6,7 +6,7 @@ function ViewCardStatus() {
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
     const token = authContext.token;
-    const url = 'http://localhost:9001/cards/' + userId + "/all";
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/` + userId + "/all";
     const headers = ['Nickname', 'Balance', 'Interest Rate', 'Expires', 'Type']
     const maxWidths = [0, 0, 1050, 900, 400]
     const headerId = ['nickname', '', 'balance', 'interest', 'expireDate', 'cardType_typeName']

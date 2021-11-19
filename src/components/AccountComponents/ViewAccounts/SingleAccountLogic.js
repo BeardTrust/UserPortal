@@ -19,9 +19,9 @@ const AccountSingle = () => {
     const [sortOrder, setSortOrder] = useState('statusTime,desc');
     const [isDirty, setIsDirty] = useState(true);
     let searchEntry;
-    let transactionUrl = `http://localhost:9001/accounts/transactions/${id}?page=${pageNumber}&size=${pageSize}&sort=${sortOrder}`
+    let transactionUrl = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${id}?page=${pageNumber}&size=${pageSize}&sort=${sortOrder}`
     const pageSizes = [5, 10, 15, 20, 25, 50, 100]
-    const url = `http://localhost:9001/accounts/${id}`
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/${id}`
 
     const onChangePageSize = async (event) => {
         console.log(event.target.value)

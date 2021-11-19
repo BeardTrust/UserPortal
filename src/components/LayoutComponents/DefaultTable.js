@@ -43,6 +43,12 @@ const DefaultTable = (props) => {
     const [titles, setTitles] = useState(props.headers)
     console.log('available objects start as: ', availableObjects)
 
+
+    /**
+    * This function determines resolution of the current window for the purposes of resizing tables
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    */
     function checkMobile() {
         if (width < 1050) {
             console.log('is mobile')
@@ -64,6 +70,11 @@ const DefaultTable = (props) => {
 
     }
 
+    /**
+    * This function resets all sort and search fields before sending a fresh request 
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    */
     function resetSearch() {
         for (let i of titles) {
             i.active = false;
@@ -85,6 +96,13 @@ const DefaultTable = (props) => {
         setCurrentPage(1);
     }
 
+    /**
+    * This function is the primary data retrieval callback method. 
+    * It uses state variables passed from the calling methods. 
+    * It stores all necessary data in state and sets any error messages required.
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    */
     const getList = useCallback(async () => {
         if (searchCriteria === "") {
             setSearchCriteria('');
@@ -131,11 +149,20 @@ const DefaultTable = (props) => {
                 }
             })
             .catch((e) => {
-                console.log('error: ', e.response)
-                setErrorCode(e.response.status)
+                if (e.response) {
+                    console.log('error with response: ', e.response)
+                    try {
+                        setErrorCode(e.response.status)
+                        setErrorPresent(true)
+                    } catch (e) { console.log('exception: ', e) }
                     window.setTimeout(() => {
                         window.location.reload();
                     }, 5000)
+                } else {
+                    console.log('error: ', e)
+                    setErrorCode('NETWORK')
+                    setErrorPresent(true)
+                }
             })
         console.log("default outbound url: ", url);
         console.log('available objects: ', availableObjects);
@@ -150,6 +177,13 @@ const DefaultTable = (props) => {
         }
     }, [getList, availableObjects, objectsDisplayed, titles, url, rows, pageSize, currentPage]);
 
+    /**
+    * This function adds sorting fields to the outbound parameters for the respective service to parse.
+    * It accepts an event from the column header that triggers it, which contains the field to sort by.
+    * There is no return value, as everything is being stored in the state.
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    */
     function addToSort(event) {
         console.log('add to sort...')
         let sort = '';
@@ -212,6 +246,15 @@ const DefaultTable = (props) => {
         }
     }
 
+    /**
+    * This function determines the direction that a sorting field will be ordered by.
+    * it accepts the field in question, determines the current direction, and swotches it to the opposite. 
+    * The function returns the updated field.
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    * 
+    * @returns {props:field}
+    */
     function toggleDirection(field) {
         if (field.direction === 'asc') {
             field.direction = 'desc';
@@ -222,6 +265,14 @@ const DefaultTable = (props) => {
         return field;
     }
 
+    /**
+    * This function determines which type of data it is presenting,
+    * builds table headers out of the data,
+    * and returns the JSX table headers for display.
+    * This function requires no props, as it uses state variables from the containing body.
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    */
     function titleBuilder() {
         const outTitles = []
         const title = []
@@ -238,6 +289,12 @@ const DefaultTable = (props) => {
         return outTitles
     }
 
+    /**
+    * This function determines which type of data it is presenting,
+    * builds rows out of the data,
+    * and returns JSX rows for display.
+    * This function requires no props, as it uses state variables from the containing body.
+    */
     function typeSelector() {
         const rows = []
         const row = []
@@ -437,14 +494,17 @@ const DefaultTable = (props) => {
                         </p>
                         {errorCode === 503 &&
                             <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted.</p>
-                            }
-                            {errorCode === (404 || 405) &&
+                        }
+                        {errorCode === (404 || 405) &&
                             <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
-                            }
-                            {errorCode === 403 &&
+                        }
+                        {errorCode === 403 &&
                             <p>A 403 error indicates a permissions issue. In all likelihood, you just need to re-login to re-authenticate yourself.</p>
-                            }
-                            <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
+                        }
+                        {errorCode === 'NETWORK' &&
+                            <p>A NETWORK error indicates the website couldn't get a response from the back-end in any way. Our servers are likely down.</p>
+                        }
+                        <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
                     </div>
                 }
                 <Pagination className={'my-3'} count={numberOfPages} page={currentPage} siblingCount={1}

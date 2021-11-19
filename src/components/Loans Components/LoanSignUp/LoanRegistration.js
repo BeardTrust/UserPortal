@@ -27,7 +27,7 @@ const LoanRegistration = () => {
     async function getLoanType() {
         console.log('get call')
         console.log('loan type id: ', loanTypeId)
-        var url = "http://localhost:9001/loantypes/" + loanTypeId
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE_TYPES}/` + loanTypeId
         try {
         const response = await axios.get(url, {
             headers: {
@@ -47,7 +47,7 @@ const LoanRegistration = () => {
     async function getLoan() {
         console.log('get call')
         console.log('loan type id: ', loanTypeId)
-        var url = "http://localhost:9001/loans/new"
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}/new`
         try {
         const response = await axios.get(url, {
             headers: {
@@ -67,7 +67,7 @@ const LoanRegistration = () => {
     async function submitHandler(event) {
         event.preventDefault();
         console.log('submit handler sending: ', loanType);
-        var url = "http://localhost:9001/loantypes/" + userId
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE_TYPES}/` + userId
         const response = await axios.post(url, loanType, {
             headers: {
                 'Authorization': token,
@@ -83,7 +83,7 @@ const LoanRegistration = () => {
         event.preventDefault();
         loan.loanType.id = loanTypeId;
         console.log('accept handler sending: ', loan);
-        var url = "http://localhost:9001/loans"
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}`
         const response = await axios.post(url, loan, {
             params: {
                 userId: userId

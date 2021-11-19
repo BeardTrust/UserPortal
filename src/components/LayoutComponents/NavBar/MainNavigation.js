@@ -37,7 +37,7 @@ function MainNavigation(props) {
                     >
                         <a className="nav-link" href="/">Home</a>
                         {!authContext.userIsLoggedIn && <Link className={'nav-link'} to={'/users'}>Register</Link>}
-                        {authContext.userIsLoggedIn && <Link className={'nav-link'} to={'/'}>Profile</Link>}
+                        {authContext.userIsLoggedIn && <Link className={'nav-link'} to={'/me'}>Profile</Link>}
                         {authContext.userIsLoggedIn &&
                             <NavDropdown title = "Accounts">
                                 <NavDropdown.Item>

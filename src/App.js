@@ -17,6 +17,7 @@ import HomePage from "./components/Pages/HomePage/HomePage";
 import LoanRegistration from "./components/Loans Components/LoanSignUp/LoanRegistration"
 import LoansOnOffer from "./components/Loans Components/LoanViews/LoansOnOffer"
 import ViewLoanStatus from './components/Loans Components/LoanViews/LoanListBuilder';
+const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_USER_SERVICE}`
 
 function App() {
     const authContext = useContext(AuthContext);
@@ -28,7 +29,7 @@ function App() {
                 </Route>
                 <Route path={'/users'}>
                     <Layout>
-                        {!authContext.userIsLoggedIn && <RegistrationForm url={'http://localhost:9001/users'}/>}
+                        {!authContext.userIsLoggedIn && <RegistrationForm url={url}/>}
                     </Layout>
                 </Route>
                 <Route path={'/me'}>

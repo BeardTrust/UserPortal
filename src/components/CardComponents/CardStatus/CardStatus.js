@@ -41,7 +41,7 @@ function CardStatus(props) {
         setCurrentCard(props.card);
         console.log('get accounts')
         if (!pay) {
-            const list = await axios.get("http://localhost:9001/accounts/me", {
+            const list = await axios.get(`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/me`, {
                 params: { userId: userId },
                 headers: {
                     'Authorization': token,
@@ -109,7 +109,7 @@ function CardStatus(props) {
         console.log('canPay: ', canPay)
         if (canPay && confirmPayment) {
             console.log('canPay true')
-            const res = await axios.post(('http://localhost:9001/accounts/' + userId + '/' + paymentAccount.id),
+            const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
                 {
                     headers: {
@@ -118,7 +118,7 @@ function CardStatus(props) {
                     }
                 }
             )
-            const res2 = await axios.post(('http://localhost:9001/cards/' + userId + '/' + currentCard.id),
+            const res2 = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/` + userId + '/' + currentCard.id),
                 cv,
                 {
                     headers: {

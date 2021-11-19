@@ -37,7 +37,7 @@ function CardSignUp(props) {
     const dateOfBirthRef = useRef();
     const nicknameRef = useRef();
 
-    const url = 'http://localhost:9001/cards/'
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}`
     const history = useHistory();
 
     /**

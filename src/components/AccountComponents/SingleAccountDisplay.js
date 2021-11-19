@@ -182,7 +182,7 @@ const SingleAccount = ({ accounts }) => {
     async function changeMoney(amount) {
         alert("The ability to submit transactions has not been implemented yet.")
         // TransferEntity.amount = amount
-        // const url = 'http://localhost:9001/accounts/' + account.accountId
+        // const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + account.accountId
         // const headers = {
         //     'Authorization': token,
         //     'Content-Type': 'application/json'
