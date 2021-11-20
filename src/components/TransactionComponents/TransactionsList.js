@@ -11,7 +11,7 @@ function TransactionsList(props) {
     const authContext = useContext(AuthContext);
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${props.assetId}`;
     const pageSizes = [1, 5, 10, 15, 20, 25, 50];
-    const [modified, setModified] = useState();
+    const [modified, setModified] = useState(true);
     const [transactions, setTransactions] = useState();
     const [pageSize, setPageSize] = useState(5);
     const [sortBy, setSortBy] = useState('statusTime,asc');
@@ -23,9 +23,39 @@ function TransactionsList(props) {
     const [sortByAmount, setSortByAmount] = useState({ active: false, name: 'transactionAmount', direction: 'asc' });
     const [sortByStatus, setSortByStatus] = useState({ active: false, name: 'transactionStatus', direction: 'asc' });
 
+    function colorStyle(props) {
+        return ({
+            color: props
+        })
+    }
+
+    function processColor(props) {
+        if (props.negative !== undefined) {
+            if (props.negative) {
+                return colorStyle("red")
+            }
+            if (!props.negative) {
+                return colorStyle("green");
+            }
+        }
+        if (props.statusName !== undefined) {
+            if (props.statusName === "Pending") {
+                return colorStyle("blue")
+            }
+            if (props.statusName === "Posted") {
+                return colorStyle("green")
+            }
+            if (props.statusName === "Declined") {
+                return colorStyle("red")
+            }
+        }
+    }
+
     const getTransactions = async () => {
-        console.log("Effect called.");
+        console.log("Effect called. Outbound url: ", url);
         setModified(false);
+            setCurrentPage(0);
+        
 
         let content = await axios.get(url, {
             params: {
@@ -38,6 +68,7 @@ function TransactionsList(props) {
                 "Authorization": authContext.token
             }
         });
+        console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
         setTransactions(content.data.content);
         setNumberOfPages(content.data.totalPages);
         console.log(content);
@@ -50,18 +81,23 @@ function TransactionsList(props) {
     }
 
     useEffect(() => {
-        getList();
+        if (transactions === undefined || modified === true) {
+            getList();
+        }
         console.log("SortBy after getList(): " + sortBy);
-    });
+    }, [modified, pageSize, currentPage]);
 
     function handlePageSizeChange(event) {
+        console.log('page size value: ', event.target.value)
         setPageSize(event.target.value);
         setCurrentPage(1);
         setModified(true);
     }
 
     async function getList() {
-        if (modified !== false) {
+        console.log('get list called, modified: ', modified)
+        if (modified) {
+            console.log('getting transactions')
             await getTransactions();
         }
 
@@ -74,11 +110,12 @@ function TransactionsList(props) {
         if (criteria.length > 0) {
             setSearchCriteria(criteria);
         } else {
-            setSearchCriteria();
+            setSearchCriteria("");
         }
     }
 
     function handlePageChange(event, value) {
+        console.log('setting current page...')
         setCurrentPage(value);
         setModified(true);
     }
@@ -229,8 +266,8 @@ function TransactionsList(props) {
                                     <td className={'align-middle text-center'}>{transaction.statusTime.slice(0, 10)}
                                     </td>
                                     <td className={'align-middle'} colSpan={'1'}>{transaction.notes}</td>
-                                    <td className={'align-middle text-center'}>{CurrencyValue.from(transaction.transactionAmount).toString()}</td>
-                                    <td className={'align-middle text-center'}>{transaction.transactionStatus.statusName}</td>
+                                    <td style={processColor(transaction.transactionAmount)} className={'align-middle text-center'}>{CurrencyValue.from(transaction.transactionAmount).toString()}</td>
+                                    <td style={processColor(transaction.transactionStatus)} className={'align-middle text-center'}>{transaction.transactionStatus.statusName}</td>
                                 </tr>
                             ))}
                         </tbody>
