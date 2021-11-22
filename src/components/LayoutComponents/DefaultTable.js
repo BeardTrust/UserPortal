@@ -33,7 +33,6 @@ const DefaultTable = (props) => {
     const [searchCriteriaChanged, setSearchCriteriaChanged] = useState(false);
     const [objectsDisplayed, setObjectsDisplayed] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const rows = []
     const sortArry = [props.headers.size]
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -48,7 +47,7 @@ const DefaultTable = (props) => {
     * 
     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
     */
-    function checkMobile() {
+    const checkMobile = useCallback(() =>{
         if (width < 1050) {
             console.log('is mobile')
             setIsMobile(true);
@@ -56,7 +55,7 @@ const DefaultTable = (props) => {
         else {
             setIsMobile(false);
         }
-    }
+    }, [width])
 
     function handlePageChange(event, value) {
         event.preventDefault();
@@ -122,7 +121,6 @@ const DefaultTable = (props) => {
 
         console.log('params: ', params);
         console.log('outbound url: ', url)
-        const list = '';
         await axios.get(url, {
             params: params,
             headers: {
@@ -166,7 +164,7 @@ const DefaultTable = (props) => {
         console.log("default outbound url: ", url);
         console.log('available objects: ', availableObjects);
     },
-        [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, rows],
+        [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, errorPresent, url, userId],
     )
 
     useEffect(() => {
@@ -174,7 +172,7 @@ const DefaultTable = (props) => {
         if (!objectsDisplayed) {
             getList();
         }
-    }, [getList, availableObjects, objectsDisplayed, titles, url, rows, pageSize, currentPage]);
+    }, [getList, availableObjects, objectsDisplayed, titles, url, pageSize, currentPage, checkMobile]);
 
     /**
     * This function adds sorting fields to the outbound parameters for the respective service to parse.
@@ -186,13 +184,12 @@ const DefaultTable = (props) => {
     function addToSort(event) {
         console.log('add to sort...')
         let sort = '';
-        let field = {};
         try {
             let title = titles[event.target.id];
             console.log('title object: ', title)
             title.sorting = true;
             titles[event.target.id].active = true;
-            field = toggleDirection(title);
+            toggleDirection(title);
             let sortingCount = 0
             let commas = 0;
             for (let j = 0; j < titles.length; j++) {
@@ -220,7 +217,6 @@ const DefaultTable = (props) => {
     }
 
     function openModal(props) {
-        console.log('openmodal found: ', props)
         switch (pageTitle) {
             case 'Your Accounts':
                 console.log('account found')
@@ -242,6 +238,10 @@ const DefaultTable = (props) => {
                 setCurrentObject(props);
                 setShow(true)
                 break;
+            default:
+                setErrorPresent(true);
+                setErrorCode('MODAL')
+                console.log('modal error found: ', props)
         }
     }
 
@@ -381,6 +381,9 @@ const DefaultTable = (props) => {
                     }
                     rows.push(<tbody>{row}</tbody>)
                     return rows;
+                default:
+                    setErrorPresent(true)
+                    setErrorCode('ROWS')
             }
         } catch (e) {
             console.log('error: ', e);
@@ -502,6 +505,12 @@ const DefaultTable = (props) => {
                         }
                         {errorCode === 'NETWORK' &&
                             <p>A NETWORK error indicates the website couldn't get a response from the back-end in any way. Our servers are likely down.</p>
+                        }
+                        {errorCode === 'MODAL' &&
+                            <p>A MODAL error indicates the front-end had issues displaying your data in the pop-up modal.</p>
+                        }
+                        {errorCode === 'ROWS' &&
+                            <p>A ROWS error indicates the front-end couldn't determine what type of data you wanted displayed.</p>
                         }
                         <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
                     </div>

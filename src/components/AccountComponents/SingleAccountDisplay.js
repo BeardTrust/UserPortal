@@ -5,7 +5,7 @@ import Deactivator from "./AccountDeactivation/AccountDeactivator";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
 import {CurrencyValue} from "../../models/currencyvalue.model";
-import TransactionsList from "../TransactionComponents/TransactionsList"
+import axios from "axios";
 
 const SingleAccount = ({ accounts }) => {
     console.log('incoming accounts: ', accounts)
@@ -19,7 +19,7 @@ const SingleAccount = ({ accounts }) => {
     useEffect(() => {
         setAccount(accounts)
         console.log('type: ', account.type)
-        if (account.type && account.type.name === 'Recovery' || isRecovery) {
+        if ((account.type && account.type.name === 'Recovery') || isRecovery) {
             setRecovery(true)
             setDeactText('Recovery Account');
         }
@@ -27,7 +27,7 @@ const SingleAccount = ({ accounts }) => {
             setRecovery(false);
         setDeactText('Deactivate');
         }
-    }, [accounts])
+    }, [accounts, account.type, isRecovery])
 
     console.log('recovery status: ', isRecovery)
 
@@ -37,7 +37,7 @@ const SingleAccount = ({ accounts }) => {
     const token = authContext.token;
     const withAmt = useRef();
     const depAmt = useRef();
-    // const TransferEntity = { amount };
+    const TransferEntity = { amount };
 
     function deactivateHandler() {
         setErDisp(Deactivator({ account }, { history }));
@@ -143,57 +143,59 @@ const SingleAccount = ({ accounts }) => {
 
     function submitWithdraw(event) {
         alert("The ability to submit transactions has not been implemented yet.")
-        // if (!event === null) {
-        //     event.preventDefault();
-        // }
-        // console.log('withdrw value:', withAmt.current.value);
-        // let amount = parseInt(withAmt.current.value, 10);
-        // if (amount === parseInt(amount, 10)) {
-        //     if (amount > 0) {
-        //         amount *= -1
-        //     }
-        //     changeMoney(amount)
-        // } else {
-        //     console.log('amount not an integer')
-        // }
+        if (!event === null) {
+            event.preventDefault();
+        }
+        console.log('withdrw value:', withAmt.current.value);
+        let amount = parseInt(withAmt.current.value, 10);
+        setAmount(parseInt(amount, 10))
+        if (amount === parseInt(amount, 10)) {
+            if (amount > 0) {
+                amount *= -1
+            }
+            changeMoney(amount)
+        } else {
+            console.log('amount not an integer')
+        }
 
     }
 
     function submitDeposit(event) {
         alert("The ability to submit transactions has not been implemented yet.")
-        // if (!event === null) {
-        //     event.preventDefault();
-        // }
-        // console.log('dpst value:', depAmt.current.value);
-        // let amount = parseInt(depAmt.current.value, 10);
-        // if (amount === parseInt(amount, 10)) {
-        //     if (amount < 0) {
-        //         amount *= -1
-        //     }
-        //     changeMoney(amount);
-        // } else {
-        //     console.log('amount not an integer')
-        // }
+        if (!event === null) {
+            event.preventDefault();
+        }
+        console.log('dpst value:', depAmt.current.value);
+        let amount = parseInt(depAmt.current.value, 10);
+        setAmount(parseInt(amount, 10))
+        if (amount === parseInt(amount, 10)) {
+            if (amount < 0) {
+                amount *= -1
+            }
+            changeMoney(amount);
+        } else {
+            console.log('amount not an integer')
+        }
 
     }
 
     async function changeMoney(amount) {
         alert("The ability to submit transactions has not been implemented yet.")
-        // TransferEntity.amount = amount
-        // const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + account.accountId
-        // const headers = {
-        //     'Authorization': token,
-        //     'Content-Type': 'application/json'
-        // };
-        //
-        // try {
-        //     const response = await axios.put(url, TransferEntity);
-        //     console.log(response.data)
-        //     setAccount(response.data)
-        //     window.location.reload();
-        // } catch (e) {
-        //     console.log(e)
-        // }
+        TransferEntity.amount = amount
+        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + account.accountId
+        const headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+        };
+        
+        try {
+            const response = await axios.put(url, TransferEntity, headers);
+            console.log(response.data)
+            setAccount(response.data)
+            window.location.reload();
+        } catch (e) {
+            console.log(e)
+        }
     }
 }
 

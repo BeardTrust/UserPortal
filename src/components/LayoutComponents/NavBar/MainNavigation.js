@@ -15,10 +15,6 @@ import "../PageLayout/Layout.css"
 function MainNavigation(props) {
     const authContext = useContext(AuthContext);
 
-    const menuHandler = () => {
-        console.log('menu clicked')
-    }
-
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('userId');

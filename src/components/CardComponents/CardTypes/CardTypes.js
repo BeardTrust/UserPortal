@@ -67,7 +67,7 @@ function CardTypes(props) {
             setAvailableCards(list.data.content);
             setNumberOfPages(list.data.totalPages);
         }
-    }, [availableCards, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy]);
+    }, [availableCards, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, url]);
 
     useEffect(() => {
         if (!cardsDisplayed) {

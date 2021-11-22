@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, useCallback } from "react";
 import { CurrencyValue } from "../../models/currencyvalue.model";
 import { Dropdown } from "react-bootstrap";
 import AuthContext from "../../store/auth-context";
@@ -29,7 +29,7 @@ function PaymentCluster(props) {
     const token = authContext.token;
     const enteredValue = useRef();
 
-    async function getAccounts() {
+    const getAccounts = useCallback( async () => {
         console.log('get accounts')
         if (!pay) {
             const list = await axios.get(`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/me`, {
@@ -50,12 +50,12 @@ function PaymentCluster(props) {
             }
             setPay(true);
         }
-    }
+    }, [availableAccounts, pay, token, userId])
 
     useEffect(() => {
         getAccounts();
         setCurrentObject(props.object);
-    }, [availableAccounts, pay, props.object])
+    }, [availableAccounts, pay, props.object, getAccounts])
 
     async function processTransaction(type, amount) {
         if (props.transType === 'Loan') {

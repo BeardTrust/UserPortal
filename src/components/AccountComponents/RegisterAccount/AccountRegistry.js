@@ -6,7 +6,6 @@ import { Alert } from "react-bootstrap";
 import {CurrencyValue} from "../../../models/currencyvalue.model";
 import {AccountType} from "../../../models/accounttype.model";
 import { useHistory } from "react-router-dom";
-import { withRouter } from 'react-router-dom';
 
 function AccountRegistration() {
 
@@ -47,7 +46,6 @@ function AccountRegistration() {
         const enteredNickname = nickname.current.value;
         const enteredDeposit = balance.current.value;
         let cdate = new Date();
-        const typeAns = actType
 
         if(balance.current.value === null){
             balance.current.value = 0.0;

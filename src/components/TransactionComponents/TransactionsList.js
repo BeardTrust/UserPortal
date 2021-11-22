@@ -1,5 +1,5 @@
 import AuthContext from "../../store/auth-context";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { Table } from "react-bootstrap";
 import { CurrencyValue } from "../../models/currencyvalue.model";
 import Pagination from '@material-ui/lab/Pagination';
@@ -22,6 +22,40 @@ function TransactionsList(props) {
     const [sortByDescription, setSortByDescription] = useState({ active: false, name: 'notes', direction: 'asc' });
     const [sortByAmount, setSortByAmount] = useState({ active: false, name: 'transactionAmount', direction: 'asc' });
     const [sortByStatus, setSortByStatus] = useState({ active: false, name: 'transactionStatus', direction: 'asc' });
+
+    const getTransactions = useCallback(async () => {
+        console.log("Effect called. Outbound url: ", url);
+        setModified(false);
+            setCurrentPage(0);
+        
+
+        let content = await axios.get(url, {
+            params: {
+                page: currentPage === 0 ? 0 : currentPage - 1,
+                size: pageSize,
+                sort: sortBy,
+                search: searchCriteria
+            },
+            headers: {
+                "Authorization": authContext.token
+            }
+        });
+        console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
+        setTransactions(content.data.content);
+        setNumberOfPages(content.data.totalPages);
+        console.log(content);
+    }, [authContext.token, currentPage, pageSize, searchCriteria, sortBy, url])
+    
+    const getList = useCallback( async () => 
+     {
+        console.log('get list called, modified: ', modified)
+        if (modified) {
+            console.log('getting transactions')
+            await getTransactions();
+        }
+
+        setModified(false);
+    }, [getTransactions, modified])
 
     function colorStyle(props) {
         return ({
@@ -51,29 +85,6 @@ function TransactionsList(props) {
         }
     }
 
-    const getTransactions = async () => {
-        console.log("Effect called. Outbound url: ", url);
-        setModified(false);
-            setCurrentPage(0);
-        
-
-        let content = await axios.get(url, {
-            params: {
-                page: currentPage === 0 ? 0 : currentPage - 1,
-                size: pageSize,
-                sort: sortBy,
-                search: searchCriteria
-            },
-            headers: {
-                "Authorization": authContext.token
-            }
-        });
-        console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
-        setTransactions(content.data.content);
-        setNumberOfPages(content.data.totalPages);
-        console.log(content);
-    }
-
     function resetSearch() {
         deactivateSortParams();
         setSortBy('statusTime,asc');
@@ -85,23 +96,13 @@ function TransactionsList(props) {
             getList();
         }
         console.log("SortBy after getList(): " + sortBy);
-    }, [modified, pageSize, currentPage, sortBy, transactions]);
+    }, [modified, pageSize, currentPage, sortBy, transactions, getList]);
 
     function handlePageSizeChange(event) {
         console.log('page size value: ', event.target.value)
         setPageSize(event.target.value);
         setCurrentPage(1);
         setModified(true);
-    }
-
-    async function getList() {
-        console.log('get list called, modified: ', modified)
-        if (modified) {
-            console.log('getting transactions')
-            await getTransactions();
-        }
-
-        setModified(false);
     }
 
     function handleSearchCriteriaChange(event) {
