@@ -1,5 +1,4 @@
-import { Table, Modal, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Table, Modal } from "react-bootstrap";
 import Pagination from '@material-ui/lab/Pagination';
 import { useState, useEffect, useCallback, useContext } from "react";
 import AuthContext from "../../store/auth-context";
@@ -23,7 +22,7 @@ const DefaultTable = (props) => {
     const pageTitle = props.title
     const [errorPresent, setErrorPresent] = useState(false);
     const [errorCode, setErrorCode] = useState();
-    const [errorTitle, setErrorTitle] = useState(props.errorTitle);
+    const errorTitle = props.errorTitle;
     const [availableObjects, setAvailableObjects] = useState([]);
     const [currentObject, setCurrentObject] = useState();
     const [numberOfPages, setNumberOfPages] = useState(5);
@@ -40,7 +39,7 @@ const DefaultTable = (props) => {
     const handleClose = () => setShow(false);
     const { width } = useWindowDimensions();
     const [isMobile, setIsMobile] = useState(false)
-    const [titles, setTitles] = useState(props.headers)
+    const titles = props.headers
     console.log('available objects start as: ', availableObjects)
 
 

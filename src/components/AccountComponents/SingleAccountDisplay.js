@@ -14,8 +14,6 @@ const SingleAccount = ({ accounts }) => {
     const [deactivateText, setDeactText] = useState()
     const [amount, setAmount] = useState(new CurrencyValue(false, 0, 0));
     const [show, setShow] = useState(false);
-    // const [showWarn, setShowWarn] = useState(false);
-    // const [showMsg, setWarnMsg] = useState(false);
     const [erdisp, setErDisp] = useState(false);
     const history = useHistory();
     useEffect(() => {

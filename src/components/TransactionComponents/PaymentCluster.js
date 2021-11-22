@@ -1,13 +1,23 @@
 import { useState, useContext, useEffect, useRef } from "react";
 import { CurrencyValue } from "../../models/currencyvalue.model";
-import { Dropdown, Modal } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import AuthContext from "../../store/auth-context";
 import axios from "axios";
 import { Button } from "react-bootstrap";
 import { GiPayMoney } from "react-icons/gi"
-
+import { LoanTransactionModel } from "../../models/loanTransactionModel";
+import { CardTransactionModel } from "../../models/cardtransaction.model"
+/**
+ * This is simply a modal fo the user to review and pay on an individual loan
+ *
+ * @author Nathanael Grier <Nathanael.Grier@Smoothstack.com>
+ * @param props.object an object to pay on (card or loan)
+ * @param props.endpoint The endpoint to pay towards for the object being paid on
+ *
+ * @returns {JSX.Element} the page displaying the loan details
+ */
 function PaymentCluster(props) {
-
+    console.log('payment cluster props: ', props)
     const [maxPayment, setMaxPayment] = useState(null);
     const [availableAccounts, setAvailableAccounts] = useState([]);
     const [paymentAccount, setPaymentAccount] = useState();
@@ -45,7 +55,44 @@ function PaymentCluster(props) {
     useEffect(() => {
         getAccounts();
         setCurrentObject(props.object);
-    }, [availableAccounts, pay])
+    }, [availableAccounts, pay, props.object])
+
+    async function processTransaction(type, amount) {
+        if (props.transType === 'Loan') {
+            console.log('loan transaction model being made...')
+            const t = new LoanTransactionModel('', type, 'LOAN', amount, 'PENDING', paymentAccount.id, currentObject.id, Date.now(), "A transaction from account " + paymentAccount.nickname + " to your " + currentObject.loanType.typeName + " loan with an amount of " + amount)
+            console.log('transaction made: ', t)
+            const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}`
+            const res = await axios.post((url),
+                t,
+                {
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            console.log('transaction response: ', res.data.transactionStatus.statusName)
+            return res.data.transactionStatus.statusName
+        }
+        if (props.transType === 'Card') {
+            console.log('loan transaction model being made...')
+            const t = new CardTransactionModel('', type, 'CARD', amount, 'PENDING', paymentAccount.id, currentObject.id, Date.now(), "A transaction from account " + paymentAccount.nickname + " to your " + currentObject.cardType.typeName + " card with an amount of " + amount)
+            console.log('transaction made: ', t)
+            const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}`
+            const res = await axios.post((url),
+                t,
+                {
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            console.log('transaction response: ', res.data.transactionStatus.statusName)
+            return res.data.transactionStatus.statusName
+        }
+    }
 
     async function makePayment(event) {
         event.preventDefault();
@@ -62,7 +109,6 @@ function PaymentCluster(props) {
         const objectBalance = new CurrencyValue(currentObject.balance.negative, currentObject.balance.dollars, currentObject.balance.cents)
         console.log('entered value dollars: ', Math.abs(Math.trunc(parseFloat(desiredValue))))
         console.log('entered value cents: ', Math.abs(Math.trunc(((parseFloat(desiredValue) * 100) % 100))))
-        var a = currentObject.balance.dollars.toString() + '.' + (currentObject.balance.cents / 100).toString()
         console.log('current object: ', objectBalance.toString())
         console.log('new cv: ', cv.toString())
 
@@ -95,7 +141,12 @@ function PaymentCluster(props) {
         console.log('payment object set to: ', currentObject)
         console.log('confirm payment: ', confirmPayment)
         console.log('canPay: ', canPay)
+        var stat
         if (canPay && confirmPayment) {
+            stat = await processTransaction('PAYMENT', cv);
+            console.log('transaction status: ', stat)
+        }
+        if (stat === 'Posted') {
             console.log('canPay true')
             const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
@@ -118,7 +169,7 @@ function PaymentCluster(props) {
             console.log('account payment response: ', res)
             console.log('object payment response: ', res2)
         }
-        window.location.reload();
+        // window.location.reload();
     }
 
     function dropHandler(dropInput) {
@@ -153,10 +204,10 @@ function PaymentCluster(props) {
                 </div>
             }
             {pay === true && paymentAccount &&
-                    <Button variant="primary" onClick={makePayment}>
-                        Confirm Payment <GiPayMoney />
-                    </Button>
-                }
+                <Button variant="primary" onClick={makePayment}>
+                    Confirm Payment <GiPayMoney />
+                </Button>
+            }
         </div>
     )
 }

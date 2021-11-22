@@ -7,7 +7,7 @@ import { FcRefresh, FcSearch } from "react-icons/fc";
 import axios from "axios";
 
 function TransactionsList(props) {
-    console.log('props rcvd: ', props)
+    console.log('transaction list props rcvd: ', props)
     const authContext = useContext(AuthContext);
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${props.assetId}`;
     const pageSizes = [1, 5, 10, 15, 20, 25, 50];
@@ -85,7 +85,7 @@ function TransactionsList(props) {
             getList();
         }
         console.log("SortBy after getList(): " + sortBy);
-    }, [modified, pageSize, currentPage]);
+    }, [modified, pageSize, currentPage, sortBy, transactions]);
 
     function handlePageSizeChange(event) {
         console.log('page size value: ', event.target.value)

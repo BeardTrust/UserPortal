@@ -20,21 +20,15 @@ function CardSignUp(props) {
     const actionContext = useContext(ActionContext);
     const authContext = useContext(AuthContext);
 
-    const [cardId, setCardId] = useState(actionContext.targetId);
-    const [userId, setUserId] = useState(authContext.userId);
+    const cardId = actionContext.targetId;
+    const userId = authContext.userId;
     const [errorMessage, setErrorMessage] = useState();
-    const [emailError, setEmailError] = useState(false);
     const [firstNameError, setFirstNameError] = useState(false);
     const [lastNameError, setLastNameError] = useState(false);
     const [phoneError, setPhoneError] = useState(false);
     const [dateOfBirthError, setDateOfBirthError] = useState(false);
     const [nicknameError, setNicknameError] = useState(false);
 
-    const emailRef = useRef();
-    const firstNameRef = useRef();
-    const lastNameRef = useRef();
-    const phoneRef = useRef();
-    const dateOfBirthRef = useRef();
     const nicknameRef = useRef();
 
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}`

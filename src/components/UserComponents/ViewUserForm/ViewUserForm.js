@@ -24,7 +24,7 @@ function ViewUserForm() {
     const usernameRef = useRef();
     const dateOfBirthRef = useRef();
 
-    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_USER_SERVICE}` + '/' + userId
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_USER_SERVICE}/` + userId
 
     useEffect(() =>
         axios.get(
@@ -52,7 +52,7 @@ function ViewUserForm() {
                     console.log('VIEW FAILURE: Code 403 (Forbidden). Your login may be expired or your URL may be incorrect.')
                 }
                 console.log('Error message: ', e.message);
-            }), []
+            })
     )
 
     function submitUpdate(event) {

@@ -12,12 +12,13 @@ const LoanRegistration = () => {
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
     const token = authContext.token;
-    const [loanTypeId, setLoanTypeId] = useState(actionContext.targetId);
+    const loanTypeId = actionContext.targetId;
     const [loanType, setLoanType] = useState();
     const [loan, setLoan] = useState();
     const [loanDisplay, setLoanDisplay] = useState(false);
     const [show, setShow] = useState(false);
     const [warn, showWarn] = useState(false);
+    
     useEffect(() => {
         if (loanType === undefined && loanTypeId !== null) {
             getLoanType();
@@ -44,25 +45,25 @@ const LoanRegistration = () => {
     }
     }
 
-    async function getLoan() {
-        console.log('get call')
-        console.log('loan type id: ', loanTypeId)
-        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}/new`
-        try {
-        const response = await axios.get(url, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        });
-        var loan =  response.data;
-        console.log('loan: ', loan)
-        console.log('outbound url: ', url)
-        setLoanType(loan);
-    } catch (e) {
-        console.log('error caught: ', e)
-    }
-    }
+    // async function getLoan() {
+    //     console.log('get call')
+    //     console.log('loan type id: ', loanTypeId)
+    //     var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}/new`
+    //     try {
+    //     const response = await axios.get(url, {
+    //         headers: {
+    //             'Authorization': token,
+    //             'Content-Type': 'application/json'
+    //         }
+    //     });
+    //     var loan =  response.data;
+    //     console.log('loan: ', loan)
+    //     console.log('outbound url: ', url)
+    //     setLoanType(loan);
+    // } catch (e) {
+    //     console.log('error caught: ', e)
+    // }
+    // }
 
     async function submitHandler(event) {
         event.preventDefault();

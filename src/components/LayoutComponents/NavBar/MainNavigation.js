@@ -1,6 +1,6 @@
-import { useContext, useState } from 'react';
-import { Link, Redirect } from 'react-router-dom';
-import { Dropdown, Nav, Navbar, Offcanvas, NavDropdown, Container, Form, FormControl, Button } from "react-bootstrap";
+import { useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { Nav, Navbar, NavDropdown, Container } from "react-bootstrap";
 import AuthContext from '../../../store/auth-context';
 import "../PageLayout/Layout.css"
 
