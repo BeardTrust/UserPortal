@@ -20,6 +20,7 @@ function LoanModal(props) {
     const [pay, setPay] = useState(false);
     const [currentLoan, setCurrentLoan] = useState();
     const [paymentAccount, setPaymentAccount] = useState();
+    const [transStatus, setTransStatus] = useState();
     const handleClosePayment = () => setPay(false);
     console.log('loan modal reached');
 
@@ -70,6 +71,7 @@ function LoanModal(props) {
     }
 
     async function processTransaction(type, amount) {
+        // amount.dollars = 1000
         const t = new LoanTransactionModel('', type, 'LOAN', amount, 'PENDING', paymentAccount.id, currentLoan.id, Date.now(), "A transaction from account " + paymentAccount.nickname + " to your " + currentLoan.loanType.typeName + " loan with an amount of " + amount)
         console.log('transaction made: ', t)
         const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}`
@@ -82,7 +84,9 @@ function LoanModal(props) {
                 }
             }
         )
-        console.log('transaction response: ', res)
+        console.log('transaction response: ', res.data.transactionStatus.statusName)
+        setTransStatus(res.data.transactionStatus.statusName)
+        return res.data.transactionStatus.statusName
     }
 
     async function makePayment(event) {
@@ -132,8 +136,12 @@ function LoanModal(props) {
         console.log('payment loan set to: ', currentLoan)
         console.log('confirm payment: ', confirmPayment)
         console.log('canPay: ', canPay)
+        var stat
         if (canPay && confirmPayment) {
-            processTransaction('PAYMENT', cv);
+            stat = await processTransaction('PAYMENT', cv);
+            console.log('transaction status: ', stat)
+        }
+        if (stat === 'Posted') {
             console.log('canPay true')
             const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
@@ -156,7 +164,7 @@ function LoanModal(props) {
             console.log('account payment response: ', res)
             console.log('loan payment response: ', res2)
         }
-        // window.location.reload();
+        window.location.reload();
     }
 
     return (
@@ -226,11 +234,8 @@ function LoanModal(props) {
                                 </div>
                             }
                         </div>
-                        }
+                    }
                 </div>
-                <TransactionsList assetId={props.loan.id} loan={props.loan} search={props.loan.id} />
-            </Modal.Body>
-            <Modal.Footer>
                 {pay === true &&
                     <Button variant="secondary" onClick={handleClosePayment}>
                         Cancel
@@ -245,6 +250,9 @@ function LoanModal(props) {
                         Confirm Payment <GiPayMoney />
                     </Button>
                 }
+            </Modal.Body>
+            <Modal.Footer>
+                <TransactionsList assetId={props.loan.id} loan={props.loan} search={props.loan.id} />
             </Modal.Footer>
         </section>)
 }

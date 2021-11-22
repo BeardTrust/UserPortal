@@ -146,12 +146,12 @@ const LoanRegistration = () => {
                     }
                     {loanDisplay === true &&
                         <FormGroup>
-                            <FormLabel htmlFor={'username'} className={'col-form-label'}>Day of Creation: {loan ? loan.createDate : null}</FormLabel>
+                            <FormLabel htmlFor={'username'} className={'col-form-label'}>Day of Creation: {loan ? loan.createDate.slice(8, 10) + '/' + loan.createDate.slice(5, 7) + '/' + loan.createDate.slice(0, 4)  : null}</FormLabel>
                         </FormGroup>
                     }
                     {loanDisplay === true &&
                         <FormGroup>
-                            <FormLabel htmlFor={'username'} className={'col-form-label'}>First Payment: {loan ? loan.nextDueDate : null}</FormLabel>
+                            <FormLabel htmlFor={'username'} className={'col-form-label'}>First Payment: {loan ? loan.payment.nextDueDate.slice(8, 10) + '/' + loan.payment.nextDueDate.slice(5, 7) + '/' + loan.payment.nextDueDate.slice(0, 4) : null}</FormLabel>
                         </FormGroup>
                     }
                     {loanDisplay === false &&
