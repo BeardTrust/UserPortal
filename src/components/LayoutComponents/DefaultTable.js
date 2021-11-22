@@ -39,7 +39,9 @@ const DefaultTable = (props) => {
     const { width } = useWindowDimensions();
     const [isMobile, setIsMobile] = useState(false)
     const titles = props.headers
-    console.log('available objects start as: ', availableObjects)
+    if (availableObjects.length === 0) {
+        console.log('default table reached with props: ', props)
+    }
 
 
     /**
@@ -47,7 +49,7 @@ const DefaultTable = (props) => {
     * 
     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
     */
-    const checkMobile = useCallback(() =>{
+    const checkMobile = useCallback(() => {
         if (width < 1050) {
             console.log('is mobile')
             setIsMobile(true);
@@ -105,7 +107,6 @@ const DefaultTable = (props) => {
         if (searchCriteria === "") {
             setSearchCriteria('');
         }
-        console.log("search: ", searchCriteria);
         let params = null;
         if (searchCriteria !== '') {
             params = {
@@ -118,9 +119,6 @@ const DefaultTable = (props) => {
         } else {
             params = { page: currentPage === 0 ? 0 : currentPage - 1, size: pageSize, sortBy: sortBy, userId: userId };
         }
-
-        console.log('params: ', params);
-        console.log('outbound url: ', url)
         await axios.get(url, {
             params: params,
             headers: {
@@ -131,7 +129,6 @@ const DefaultTable = (props) => {
             .then(res => {
                 console.log('response: ', res)
                 if (res.data.content !== availableObjects) {
-                    console.log('list data found: ', res.data);
                     if (searchCriteriaChanged) {
                         setCurrentPage(1);
                         setSearchCriteriaChanged(false);
@@ -156,13 +153,11 @@ const DefaultTable = (props) => {
                         window.location.reload();
                     }, 5000)
                 } else {
-                    console.log('error: ', e)
+                    console.log('getList error: ', e)
                     setErrorCode('NETWORK')
                     setErrorPresent(true)
                 }
             })
-        console.log("default outbound url: ", url);
-        console.log('available objects: ', availableObjects);
     },
         [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, errorPresent, url, userId],
     )
@@ -278,13 +273,13 @@ const DefaultTable = (props) => {
         for (let i = 0; i < titles.length; i++) {
             if (titles[i].maxWidth < width) {
                 title.push(
-                    <th style={Style} className={'align-middle text-center'} data-sortable={'true'}
+                    <th key={i} style={Style} className={'align-middle text-center'} data-sortable={'true'}
                         scope={'col'} onClick={addToSort} name={title.id}
                         id={titles[i].sequence}>{titles[i].title}<br></br>{titles[i].active === true && (titles[i].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
                 )
             }
-        } title.push(<th style={Style} className={'align-middle text-center'}>Details</th>)
-        outTitles.push(<tr>{title}</tr>)
+        } title.push(<th key={titles.length} style={Style} className={'align-middle text-center'}>Details</th>)
+        outTitles.push(<tr key={titles.length}>{title}</tr>)
         return outTitles
     }
 
@@ -302,7 +297,7 @@ const DefaultTable = (props) => {
                 case 'Your Accounts':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>}
@@ -318,12 +313,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'Your Loans':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
@@ -343,12 +338,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'Your Cards':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>}
@@ -363,12 +358,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'The Loans of BeardTrust':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].typeName}</td>
                                 {width > 900 && <td className={'align-middle'}>{availableObjects.content[i].description}</td>}
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].apr + '%'}</td>
@@ -379,14 +374,16 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 default:
                     setErrorPresent(true)
                     setErrorCode('ROWS')
             }
         } catch (e) {
-            console.log('error: ', e);
+            if (availableObjects.length !== 0) {
+                console.log('display error: ', e);
+            }
             if (!errorPresent && e.response !== undefined) {
                 setErrorPresent(true);
             }
@@ -404,8 +401,8 @@ const DefaultTable = (props) => {
                     </span>
                     <select style={Style} data-testid={'pageSizeSelector'} className={'text-center align-middle'} onChange={handlePageSizeChange}
                         value={pageSize}>
-                        {pageSizes.map((size) => (
-                            <option key={size} value={size}>{size}</option>
+                        {pageSizes.map((size, index) => (
+                            <option key={index} value={size}>{size}</option>
                         ))}
                     </select>
                 </div>

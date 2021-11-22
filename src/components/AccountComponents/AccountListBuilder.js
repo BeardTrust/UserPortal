@@ -6,7 +6,6 @@ const headers = ['Account Type', 'Nickname', 'Interest Rate', 'Balance', 'Descri
 const maxWidths = [400, 0, 900, 0, 1050, 1000]
 const headerId = ['type_name', 'nickname', 'interest', 'balance_dollars', 'type_description', 'createDate']
 const titles = []
-console.log('default url: ', process.env)
 
 for (var i = 0; i < headers.length; i++) {
     var title = {
