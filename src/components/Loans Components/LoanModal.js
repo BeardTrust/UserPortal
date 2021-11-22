@@ -250,23 +250,8 @@ function LoanModal(props) {
                         Confirm Payment <GiPayMoney />
                     </Button>
                 }
-                {/* <TransactionsList assetId={props.loan.id} loan={props.loan} search={props.loan.id} /> */}
             </Modal.Body>
             <Modal.Footer>
-                {/* {pay === true &&
-                    <Button variant="secondary" onClick={handleClosePayment}>
-                        Cancel
-                    </Button>
-                }
-                {pay === false &&
-                    <Button variant="primary" onClick={handleShowPayment}>
-                        Make a Payment
-                    </Button>
-                } {pay === true && paymentAccount &&
-                    <Button variant="primary" onClick={makePayment}>
-                        Confirm Payment <GiPayMoney />
-                    </Button>
-                } */}
                 <TransactionsList assetId={props.loan.id} loan={props.loan} search={props.loan.id} />
             </Modal.Footer>
         </section>)
