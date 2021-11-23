@@ -50,14 +50,13 @@ const DefaultTable = (props) => {
     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
     */
     const checkMobile = useCallback(() => {
-        if (width < 1050) {
-            console.log('is mobile')
+        if (window.innerWidth < 1100) {
             setIsMobile(true);
         }
         else {
             setIsMobile(false);
         }
-    }, [width])
+    }, [])
 
     function handlePageChange(event, value) {
         event.preventDefault();
