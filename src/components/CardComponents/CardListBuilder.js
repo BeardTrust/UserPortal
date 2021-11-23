@@ -5,7 +5,6 @@ import AuthContext from "../../store/auth-context";
 function ViewCardStatus() {
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
-    const token = authContext.token;
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/` + userId + "/all";
     const headers = ['Nickname', 'Balance', 'Interest Rate', 'Expires', 'Type']
     const maxWidths = [0, 0, 1050, 900, 400]

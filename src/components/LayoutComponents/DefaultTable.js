@@ -1,5 +1,4 @@
-import { Table, Modal, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Table, Modal } from "react-bootstrap";
 import Pagination from '@material-ui/lab/Pagination';
 import { useState, useEffect, useCallback, useContext } from "react";
 import AuthContext from "../../store/auth-context";
@@ -23,7 +22,7 @@ const DefaultTable = (props) => {
     const pageTitle = props.title
     const [errorPresent, setErrorPresent] = useState(false);
     const [errorCode, setErrorCode] = useState();
-    const [errorTitle, setErrorTitle] = useState(props.errorTitle);
+    const errorTitle = props.errorTitle;
     const [availableObjects, setAvailableObjects] = useState([]);
     const [currentObject, setCurrentObject] = useState();
     const [numberOfPages, setNumberOfPages] = useState(5);
@@ -34,14 +33,15 @@ const DefaultTable = (props) => {
     const [searchCriteriaChanged, setSearchCriteriaChanged] = useState(false);
     const [objectsDisplayed, setObjectsDisplayed] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const rows = []
     const sortArry = [props.headers.size]
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const { width } = useWindowDimensions();
     const [isMobile, setIsMobile] = useState(false)
-    const [titles, setTitles] = useState(props.headers)
-    console.log('available objects start as: ', availableObjects)
+    const titles = props.headers
+    if (availableObjects.length === 0) {
+        console.log('default table reached with props: ', props)
+    }
 
 
     /**
@@ -49,15 +49,14 @@ const DefaultTable = (props) => {
     * 
     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
     */
-    function checkMobile() {
-        if (width < 1050) {
-            console.log('is mobile')
+    const checkMobile = useCallback(() => {
+        if (window.innerWidth < 1100) {
             setIsMobile(true);
         }
         else {
             setIsMobile(false);
         }
-    }
+    }, [])
 
     function handlePageChange(event, value) {
         event.preventDefault();
@@ -107,7 +106,6 @@ const DefaultTable = (props) => {
         if (searchCriteria === "") {
             setSearchCriteria('');
         }
-        console.log("search: ", searchCriteria);
         let params = null;
         if (searchCriteria !== '') {
             params = {
@@ -120,10 +118,6 @@ const DefaultTable = (props) => {
         } else {
             params = { page: currentPage === 0 ? 0 : currentPage - 1, size: pageSize, sortBy: sortBy, userId: userId };
         }
-
-        console.log('params: ', params);
-        console.log('outbound url: ', url)
-        const list = '';
         await axios.get(url, {
             params: params,
             headers: {
@@ -134,7 +128,6 @@ const DefaultTable = (props) => {
             .then(res => {
                 console.log('response: ', res)
                 if (res.data.content !== availableObjects) {
-                    console.log('list data found: ', res.data);
                     if (searchCriteriaChanged) {
                         setCurrentPage(1);
                         setSearchCriteriaChanged(false);
@@ -159,15 +152,13 @@ const DefaultTable = (props) => {
                         window.location.reload();
                     }, 5000)
                 } else {
-                    console.log('error: ', e)
+                    console.log('getList error: ', e)
                     setErrorCode('NETWORK')
                     setErrorPresent(true)
                 }
             })
-        console.log("default outbound url: ", url);
-        console.log('available objects: ', availableObjects);
     },
-        [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, rows],
+        [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, errorPresent, url, userId],
     )
 
     useEffect(() => {
@@ -175,7 +166,7 @@ const DefaultTable = (props) => {
         if (!objectsDisplayed) {
             getList();
         }
-    }, [getList, availableObjects, objectsDisplayed, titles, url, rows, pageSize, currentPage]);
+    }, [getList, availableObjects, objectsDisplayed, titles, url, pageSize, currentPage, checkMobile]);
 
     /**
     * This function adds sorting fields to the outbound parameters for the respective service to parse.
@@ -187,13 +178,12 @@ const DefaultTable = (props) => {
     function addToSort(event) {
         console.log('add to sort...')
         let sort = '';
-        let field = {};
         try {
             let title = titles[event.target.id];
             console.log('title object: ', title)
             title.sorting = true;
             titles[event.target.id].active = true;
-            field = toggleDirection(title);
+            toggleDirection(title);
             let sortingCount = 0
             let commas = 0;
             for (let j = 0; j < titles.length; j++) {
@@ -221,7 +211,6 @@ const DefaultTable = (props) => {
     }
 
     function openModal(props) {
-        console.log('openmodal found: ', props)
         switch (pageTitle) {
             case 'Your Accounts':
                 console.log('account found')
@@ -243,6 +232,10 @@ const DefaultTable = (props) => {
                 setCurrentObject(props);
                 setShow(true)
                 break;
+            default:
+                setErrorPresent(true);
+                setErrorCode('MODAL')
+                console.log('modal error found: ', props)
         }
     }
 
@@ -279,13 +272,13 @@ const DefaultTable = (props) => {
         for (let i = 0; i < titles.length; i++) {
             if (titles[i].maxWidth < width) {
                 title.push(
-                    <th style={Style} className={'align-middle text-center'} data-sortable={'true'}
+                    <th key={i} style={Style} className={'align-middle text-center'} data-sortable={'true'}
                         scope={'col'} onClick={addToSort} name={title.id}
                         id={titles[i].sequence}>{titles[i].title}<br></br>{titles[i].active === true && (titles[i].direction === 'asc' ? <FcAlphabeticalSortingAz /> : <FcAlphabeticalSortingZa />)}</th>
                 )
             }
-        } title.push(<th style={Style} className={'align-middle text-center'}>Details</th>)
-        outTitles.push(<tr>{title}</tr>)
+        } title.push(<th key={titles.length} style={Style} className={'align-middle text-center'}>Details</th>)
+        outTitles.push(<tr key={titles.length}>{title}</tr>)
         return outTitles
     }
 
@@ -303,7 +296,7 @@ const DefaultTable = (props) => {
                 case 'Your Accounts':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].type.name}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].nickname}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'} >{availableObjects.content[i].interest}%</td>}
@@ -319,12 +312,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'Your Loans':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.typeName}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].loanType.description}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].loanType.apr + '%'}</td>}
@@ -344,12 +337,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'Your Cards':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 {titles[0].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].nickname}</td>}
                                 {titles[1].maxWidth < width && <td className={'align-middle'}>{availableObjects.content[i].balance.dollars}</td>}
                                 {titles[2].maxWidth < width && <td className={'align-middle text-center'}>{availableObjects.content[i].interestRate.toFixed(1) + '%'}</td>}
@@ -364,12 +357,12 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
                 case 'The Loans of BeardTrust':
                     for (let i = 0; i < availableObjects.content.length; i++) {
                         row.push(
-                            <tr>
+                            <tr key={i}>
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].typeName}</td>
                                 {width > 900 && <td className={'align-middle'}>{availableObjects.content[i].description}</td>}
                                 <td className={'align-middle text-center'}>{availableObjects.content[i].apr + '%'}</td>
@@ -380,11 +373,16 @@ const DefaultTable = (props) => {
                                 </td>
                             </tr>)
                     }
-                    rows.push(<tbody>{row}</tbody>)
+                    rows.push(<tbody key={titles.length}>{row}</tbody>)
                     return rows;
+                default:
+                    setErrorPresent(true)
+                    setErrorCode('ROWS')
             }
         } catch (e) {
-            console.log('error: ', e);
+            if (availableObjects.length !== 0) {
+                console.log('display error: ', e);
+            }
             if (!errorPresent && e.response !== undefined) {
                 setErrorPresent(true);
             }
@@ -402,8 +400,8 @@ const DefaultTable = (props) => {
                     </span>
                     <select style={Style} data-testid={'pageSizeSelector'} className={'text-center align-middle'} onChange={handlePageSizeChange}
                         value={pageSize}>
-                        {pageSizes.map((size) => (
-                            <option key={size} value={size}>{size}</option>
+                        {pageSizes.map((size, index) => (
+                            <option key={index} value={size}>{size}</option>
                         ))}
                     </select>
                 </div>
@@ -503,6 +501,12 @@ const DefaultTable = (props) => {
                         }
                         {errorCode === 'NETWORK' &&
                             <p>A NETWORK error indicates the website couldn't get a response from the back-end in any way. Our servers are likely down.</p>
+                        }
+                        {errorCode === 'MODAL' &&
+                            <p>A MODAL error indicates the front-end had issues displaying your data in the pop-up modal.</p>
+                        }
+                        {errorCode === 'ROWS' &&
+                            <p>A ROWS error indicates the front-end couldn't determine what type of data you wanted displayed.</p>
                         }
                         <p>The page will continually refresh in an attempt to resolve the issue. If it persists, please contact BeardTrust customer service.</p>
                     </div>

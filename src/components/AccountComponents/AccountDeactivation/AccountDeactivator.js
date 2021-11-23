@@ -32,7 +32,7 @@ function Deactivator({ account }, { history }) {
     }
 
     function recovery(account) {
-        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}` + "/recovery/" + account.accountId
+        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/recovery/` + account.accountId
         console.log('attempting to recover: ', account)
         axios.put(url, {
             headers: {

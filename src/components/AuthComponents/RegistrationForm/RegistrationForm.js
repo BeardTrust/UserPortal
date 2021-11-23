@@ -2,7 +2,7 @@ import {useRef, useState} from "react";
 import {useHistory} from 'react-router-dom';
 import axios from "axios"
 import validator from "validator";
-import {Button, ButtonGroup, Form, FormControl, FormGroup, FormLabel} from "react-bootstrap";
+import { ButtonGroup } from "react-bootstrap";
 import './RegistrationForm.css';
 
 /**

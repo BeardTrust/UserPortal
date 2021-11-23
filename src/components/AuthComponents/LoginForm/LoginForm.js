@@ -20,9 +20,6 @@ function LoginForm(props) {
     const history = useHistory();
 
     const authContext = useContext(AuthContext)
-
-    const [attemptedLogIn, setAttemptedLogIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState();
 
     const email = useRef();
@@ -39,11 +36,8 @@ function LoginForm(props) {
         event.preventDefault();
 
         if (errorMessage) {
-            setAttemptedLogIn(false);
             setErrorMessage('');
         }
-
-        setAttemptedLogIn(true);
 
         const enteredEmail = email.current.value.toLowerCase();
         const enteredPassword = password.current.value;
@@ -53,7 +47,6 @@ function LoginForm(props) {
             password: enteredPassword
         }
 
-        setIsLoading(true);
 
         try {
             const response = await axios.post(
@@ -68,8 +61,6 @@ function LoginForm(props) {
                 }
             );
 
-            setIsLoading(false);
-
             if (response.status === 200) {
                 const token = response.headers['authorization'];
                 const userId = response.headers['btuid'];
@@ -79,7 +70,6 @@ function LoginForm(props) {
                 setErrorMessage(response.statusText);
             }
         } catch (e) {
-            setIsLoading(false);
             setErrorMessage(e.message);
 
             if (e.message === "Request failed with status code 403") {
