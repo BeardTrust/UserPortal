@@ -1,10 +1,9 @@
-import axios from "axios";
-import {useContext, useEffect, useState} from "react";
+import { useContext  } from "react";
 import AuthContext from "../../../store/auth-context";
-import {useHistory, useParams} from "react-router-dom";
-import Centerpiece from "../../LayoutComponents/Centerpiece/Centerpiece";
+import PaymentCluster from "../../TransactionComponents/PaymentCluster";
 import TransactionsList from "../../TransactionComponents/TransactionsList";
-
+import { Modal } from "react-bootstrap";
+import { CurrencyValue } from "../../../models/currencyvalue.model";
 /**
  * This function returns a page showing the details and status of a
  * single, specified card associated with the currently logged in user.
@@ -14,81 +13,52 @@ import TransactionsList from "../../TransactionComponents/TransactionsList";
  * @returns {JSX.Element} the page displaying the card details
  * @constructor
  */
-function CardStatus(){
-    const history = useHistory();
-    const {cardId} = useParams();
+function CardStatus(props) {
+    console.log('card modal props rcvd: ', props)
+    const cardId = props.card.id;
     const authContext = useContext(AuthContext);
-    const [errorMessage, setErrorMessage] = useState();
-    const [cardStatus, setCardStatus] = useState();
-    const [hasLoaded, setHasLoaded] = useState(false);
     const userId = authContext.userId;
-    const token = authContext.token;
-    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/${userId}/${cardId}`;
-
-    useEffect(() => {
-        if(!hasLoaded){
-            /**
-             * This function retrieves the card details and updates the state of the
-             * card status page.
-             *
-             * @returns {Promise<void>}
-             */
-            async function fetchCardStatus(){
-                if(!hasLoaded){
-                    const results = await axios.get(url, {
-                        headers: {
-                            'Authorization': token,
-                            'Content-Type': 'application/json'
-                        }
-                    });
-
-                    if(results){
-                        setCardStatus(results.data);
-                        setHasLoaded(true);
-                    }
-                }
-            }
-
-            try {
-                fetchCardStatus()
-            } catch (e) {
-                if (e.response) {
-                    setErrorMessage(e.response.data.message);
-                } else {
-                    setErrorMessage('Something went wrong... please try again later');
-                }
-            }
-        }
-
-    }, [hasLoaded, url, token, cardStatus]);
+    const currentCard = props.card;
 
     return (
         <section className={'container'}>
-            {errorMessage && <div className={'alert-danger mt-5'}>{errorMessage}</div>}
-            <Centerpiece content={
-                {                                                                                                                                                                                                                                                                                                               
-                    title: cardStatus?.nickname + '   ...' + cardStatus?.cardNumber?.slice(15,19),
-                    lead: 'Current Balance: $' + cardStatus?.balance?.dollars + '.' + (cardStatus?.balance?.cents > 10 ?
-                        cardStatus?.balance?.cents : '0' + cardStatus?.balance?.cents),
-                    body: 'TODO: add transactions, minimum payment, due date, and write user\'s name and card number' +
-                        ' on card image',
-                    imageText: cardStatus?.nickname,
-                    image: '/images/GenericCard.png',
-                    alt: 'Generic credit card image',
-                    buttonText: 'Make Payment',
-                    buttonClasses: 'btn-secondary',
-                    clickHandler: (event) => {
-                        event.preventDefault();
-                        if(authContext.userIsLoggedIn){
-                            setErrorMessage("Payments not implemented yet...")
-                        } else {
-                            history.push('/auth');
-                        }
-                    }
-                }
-            }/>
+            <Modal.Body >
+                <div className="form-group">
+                    <div className="input-group mb-2">
+                        <label id="typeLabel" className="input-group-text">Card Number</label>
+                        <input id="typeText" type="text" disabled={true} className="form-control" value={currentCard.cardNumber}></input>
+                    </div>
+                    <div className="input-group mb-2">
+                        <label id="typeLabel" className="input-group-text">Nickname:</label>
+                        <input id="typeText" type="text" disabled={true} className="form-control" value={currentCard.nickname}></input>
+                    </div>
+                    <div className="input-group mb-2">
+                        <label id="descriptionLabel" className="input-group-text">Description:</label>
+                        <textarea value={currentCard.cardType.description} id="descriptionText" className="form-control" readOnly="readonly">
+                            {currentCard.cardType.description}
+                        </textarea>
+                    </div>
+                    <div className="input-group mb-2">
+                        <label id="interestLabel" className="input-group-text">Interest:</label>
+                        <input id="interestText" className="form-control" type="text" disabled={true} value={currentCard.interestRate + '%'}></input>
+                    </div>
+                    <div className="input-group mb-2">
+                        <label id="amountLabel" className="input-group-text">Amount:</label>
+                        <input id="amountText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(currentCard.balance).toString()}></input>
+                    </div>
+                    <div className="input-group mb-2">
+                        <label id="createDateLabel" className="input-group-text">Date Created:</label>
+                        <input id="createDateText" className="form-control" type="text" disabled={true} value={currentCard.createDate.slice(8, 10) + '/' + currentCard.createDate.slice(5, 7) + '/' + currentCard.createDate.slice(0, 4)}></input>
+                    </div>
+                </div>
+                <div className="input-group mb-2">
+                    <PaymentCluster object={currentCard} transType='Card' endpoint={process.env.REACT_APP_CARD_SERVICE + '/' + userId + '/' + cardId} />
+                </div>
 
-            <TransactionsList assetId={cardId} />
+            </Modal.Body>
+            <Modal.Footer>
+                <TransactionsList object={currentCard.id} assetId={currentCard.id} />
+            </Modal.Footer>
 
         </section>
     );

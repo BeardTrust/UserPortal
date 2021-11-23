@@ -1,10 +1,10 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 import ActionContext from "../../../store/action-context";
 import { ButtonGroup, Button, FormGroup, Form, FormLabel, Alert } from "react-bootstrap";
 import AuthContext from "../../../store/auth-context";
 import axios from "axios";
-import {GiReceiveMoney} from "react-icons/gi"
+import { GiReceiveMoney } from "react-icons/gi"
 
 const LoanRegistration = () => {
     const history = useHistory();
@@ -12,62 +12,43 @@ const LoanRegistration = () => {
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
     const token = authContext.token;
-    const [loanTypeId, setLoanTypeId] = useState(actionContext.targetId);
+    const loanTypeId = actionContext.targetId;
     const [loanType, setLoanType] = useState();
     const [loan, setLoan] = useState();
     const [loanDisplay, setLoanDisplay] = useState(false);
     const [show, setShow] = useState(false);
     const [warn, showWarn] = useState(false);
+
+    const getLoanType = useCallback(async () => {
+        console.log('get call')
+        console.log('loan type id: ', loanTypeId)
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE_TYPES}/` + loanTypeId
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            });
+            var loan = response.data;
+            console.log('loantype: ', loan)
+            console.log('outbound url: ', url)
+            setLoanType(loan);
+        } catch (e) {
+            console.log('error caught: ', e)
+        }
+    }, [loanTypeId, token])
+
     useEffect(() => {
         if (loanType === undefined && loanTypeId !== null) {
             getLoanType();
         }
-    }, [userId]);
-
-    async function getLoanType() {
-        console.log('get call')
-        console.log('loan type id: ', loanTypeId)
-        var url = "http://localhost:9001/loantypes/" + loanTypeId
-        try {
-        const response = await axios.get(url, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        });
-        var loan =  response.data;
-        console.log('loantype: ', loan)
-        console.log('outbound url: ', url)
-        setLoanType(loan);
-    } catch (e) {
-        console.log('error caught: ', e)
-    }
-    }
-
-    async function getLoan() {
-        console.log('get call')
-        console.log('loan type id: ', loanTypeId)
-        var url = "http://localhost:9001/loans/new"
-        try {
-        const response = await axios.get(url, {
-            headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
-            }
-        });
-        var loan =  response.data;
-        console.log('loan: ', loan)
-        console.log('outbound url: ', url)
-        setLoanType(loan);
-    } catch (e) {
-        console.log('error caught: ', e)
-    }
-    }
+    }, [userId, loanType, loanTypeId, getLoanType]);
 
     async function submitHandler(event) {
         event.preventDefault();
         console.log('submit handler sending: ', loanType);
-        var url = "http://localhost:9001/loantypes/" + userId
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE_TYPES}/` + userId
         const response = await axios.post(url, loanType, {
             headers: {
                 'Authorization': token,
@@ -83,7 +64,7 @@ const LoanRegistration = () => {
         event.preventDefault();
         loan.loanType.id = loanTypeId;
         console.log('accept handler sending: ', loan);
-        var url = "http://localhost:9001/loans"
+        var url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}`
         const response = await axios.post(url, loan, {
             params: {
                 userId: userId
@@ -146,12 +127,12 @@ const LoanRegistration = () => {
                     }
                     {loanDisplay === true &&
                         <FormGroup>
-                            <FormLabel htmlFor={'username'} className={'col-form-label'}>Day of Creation: {loan ? loan.createDate : null}</FormLabel>
+                            <FormLabel htmlFor={'username'} className={'col-form-label'}>Day of Creation: {loan ? loan.createDate.slice(8, 10) + '/' + loan.createDate.slice(5, 7) + '/' + loan.createDate.slice(0, 4) : null}</FormLabel>
                         </FormGroup>
                     }
                     {loanDisplay === true &&
                         <FormGroup>
-                            <FormLabel htmlFor={'username'} className={'col-form-label'}>First Payment: {loan ? loan.nextDueDate : null}</FormLabel>
+                            <FormLabel htmlFor={'username'} className={'col-form-label'}>First Payment: {loan ? loan.payment.nextDueDate.slice(8, 10) + '/' + loan.payment.nextDueDate.slice(5, 7) + '/' + loan.payment.nextDueDate.slice(0, 4) : null}</FormLabel>
                         </FormGroup>
                     }
                     {loanDisplay === false &&
@@ -161,7 +142,7 @@ const LoanRegistration = () => {
                     }
                     {loanDisplay === true &&
                         <ButtonGroup>
-                            <Button title='registerButton' type={'submit'} className={'btn btn-primary mt-3'} onClick={acceptHandler}>Accept <GiReceiveMoney/></Button>
+                            <Button title='registerButton' type={'submit'} className={'btn btn-primary mt-3'} onClick={acceptHandler}>Accept <GiReceiveMoney /></Button>
                             <Button title='registerButton' type={'submit'} className={'btn btn-secondary mt-3'} onClick={cancelHandler}>Cancel</Button>
                         </ButtonGroup>
                     }

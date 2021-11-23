@@ -6,7 +6,6 @@ import { Alert } from "react-bootstrap";
 import {CurrencyValue} from "../../../models/currencyvalue.model";
 import {AccountType} from "../../../models/accounttype.model";
 import { useHistory } from "react-router-dom";
-import { withRouter } from 'react-router-dom';
 
 function AccountRegistration() {
 
@@ -19,7 +18,7 @@ function AccountRegistration() {
     const nickname = useRef();
     const balance = useRef();
     let actType = 'Recovery';
-    const url = "http://localhost:9001/accounts";
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}`;
     useEffect(() => {
         setTitle('Select Account Type')
     }, [actType])
@@ -47,7 +46,6 @@ function AccountRegistration() {
         const enteredNickname = nickname.current.value;
         const enteredDeposit = balance.current.value;
         let cdate = new Date();
-        const typeAns = actType
 
         if(balance.current.value === null){
             balance.current.value = 0.0;

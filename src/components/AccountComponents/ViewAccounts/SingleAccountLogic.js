@@ -1,7 +1,7 @@
 import AuthContext from "../../../store/auth-context";
 import SingleAccount from "../SingleAccountDisplay";
 import { useParams } from "react-router-dom";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useContext, useState, useCallback } from "react";
 import axios from "axios";
 import TransactionsList from "../../TransactionComponents/TransactionsList";
 import Pagination from '@material-ui/lab/Pagination';
@@ -19,9 +19,9 @@ const AccountSingle = () => {
     const [sortOrder, setSortOrder] = useState('statusTime,desc');
     const [isDirty, setIsDirty] = useState(true);
     let searchEntry;
-    let transactionUrl = `http://localhost:9001/accounts/transactions/${id}?page=${pageNumber}&size=${pageSize}&sort=${sortOrder}`
     const pageSizes = [5, 10, 15, 20, 25, 50, 100]
-    const url = `http://localhost:9001/accounts/${id}`
+    const [transactionUrl, setTransactionUrl] = useState(`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${id}?page=${pageNumber}&size=${pageSize}&sort=${sortOrder}`)
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/${id}`
 
     const onChangePageSize = async (event) => {
         console.log(event.target.value)
@@ -59,19 +59,21 @@ const AccountSingle = () => {
         setIsDirty(true);
     }
 
-    const loadTransactions = async () => {
+    const loadTransactions = useCallback(async () => {
+        let tempUrl = transactionUrl
         if(searchCriteria !== undefined)
         {
-            transactionUrl += `&search=${searchCriteria}`
+            tempUrl += `&search=${searchCriteria}`
         }
 
         if(sortOrder.split(',')[0] === 'transactionAmount.dollars'){
             if(sortOrder.split(',')[1] === 'asc'){
-                transactionUrl += '&sort=transactionAmount.cents,asc';
+                tempUrl += '&sort=transactionAmount.cents,asc';
             } else {
-                transactionUrl += '&sort=transactionAmount.cents,desc';
+                tempUrl += '&sort=transactionAmount.cents,desc';
             }
         }
+        setTransactionUrl(tempUrl);
 
         const response = await axios.get(transactionUrl);
 
@@ -79,7 +81,7 @@ const AccountSingle = () => {
             setTransactions(response.data.content)
         }
         setNumberOfPages(response.data.totalPages)
-    }
+    }, [searchCriteria, sortOrder, transactionUrl])
 
     useEffect(() => {
         if (isDirty) {
@@ -110,9 +112,9 @@ const AccountSingle = () => {
                         console.log('VIEW FAILURE: Code 403 (Forbidden). Your login may be expired or your URL may be incorrect.')
                     }
                     console.log('Error message: ', e.message + ', code: ' + e.response);
-                }), [id, url, token, pageNumber, pageSize, searchCriteria, sortOrder, transactionUrl]
+                })
         }
-    }
+    }, [id, url, token, pageNumber, pageSize, searchCriteria, sortOrder, isDirty, loadTransactions]
  )
 
     return (

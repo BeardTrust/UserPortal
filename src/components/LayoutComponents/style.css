@@ -2,7 +2,11 @@ th:hover, select:hover{
     cursor:pointer;
 }
 
-  
+.modal {
+  max-width: 150%;
+  margin: 0;
+}  
+
   .item {
     height: 500px;
     width: 00px;

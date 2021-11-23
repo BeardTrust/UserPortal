@@ -1,9 +1,10 @@
 import DefaultTable from '../LayoutComponents/DefaultTable';
 
 const AccountList = () => {
-const url = 'http://localhost:9001/accounts'
-const headers = ['Account Type', 'Nickname', 'Interest Rate', 'Balance', 'Description', 'Date Created']
-const headerId = ['type_name', 'nickname', 'interest', 'balance', 'description', 'create_date']
+const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}`
+const headers = ['Account Type', 'Nickname', 'Interest Rate', 'Balance', 'Description', 'Date Created\n(DD/MM/YYYY)']
+const maxWidths = [400, 0, 900, 0, 1050, 1000]
+const headerId = ['type_name', 'nickname', 'interest', 'balance_dollars', 'type_description', 'createDate']
 const titles = []
 
 for (var i = 0; i < headers.length; i++) {
@@ -13,6 +14,7 @@ for (var i = 0; i < headers.length; i++) {
         active: false,
         sorting: false,
         id: headerId[i],
+        maxWidth: maxWidths[i],
         sequence: i
     }
     titles.push(title);
@@ -20,7 +22,7 @@ for (var i = 0; i < headers.length; i++) {
 
 return (
     <>
-    <DefaultTable headers={titles} title='Your Accounts' url={url}/>
+    <DefaultTable headers={titles} title='Your Accounts' url={url} errorTitle='ACCOUNTSERVICE'/>
     </>
 );
 }

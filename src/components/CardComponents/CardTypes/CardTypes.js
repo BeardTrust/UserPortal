@@ -31,7 +31,7 @@ function CardTypes(props) {
     const [sortByTypeName, setSortByTypeName] = useState({active: false, name: 'typeName', direction: 'asc'});
     const [sortByDescription, setSortByDescription] = useState({active: false, name: 'description', direction: 'asc'});
     const [sortByInterest, setSortByInterest] = useState({active: false, name: 'baseInterestRate', direction: 'asc'});
-    const url = 'http://localhost:9001/cards/available'
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/available`
     const [numberOfPages, setNumberOfPages] = useState(10);
     const pageSizes = [5, 10, 15, 20, 25, 50, 100]
 
@@ -67,7 +67,7 @@ function CardTypes(props) {
             setAvailableCards(list.data.content);
             setNumberOfPages(list.data.totalPages);
         }
-    }, [availableCards, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy]);
+    }, [availableCards, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, url]);
 
     useEffect(() => {
         if (!cardsDisplayed) {

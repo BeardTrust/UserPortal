@@ -1,9 +1,10 @@
 import DefaultTable from '../../LayoutComponents/DefaultTable';
 
 function ViewLoanStatus() {
-    const url = 'http://localhost:9001/loans/me';
-    const headers = ['Loan Type', 'Description', 'APR', 'Principal', 'Balance', 'Next Payment Due', 'Paid Status', 'Minimum Due', 'Late Fee', 'Date Created']
-    const headerId = ['loanType_typeName', 'loanType_description', 'loanType_apr', 'principal', 'balance', 'nextDueDate', 'hasPaid', 'minDue', 'lateFee', 'createDate']
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_LOAN_SERVICE}/me`;
+    const headers = ['Loan Type', 'Description', 'APR', 'Principal', 'Balance', 'Next Payment Due\n(DD/MM/YYYY)', 'Paid Status', 'Minimum Due', 'Late Fee', 'Date Created\n(DD/MM/YYYY)']
+    const maxWidths = [0, 1150, 900, 400, 300, 900, 1150, 850, 800, 1000]
+    const headerId = ['loanType_typeName', 'loanType_description', 'loanType_apr', 'principal_dollars', 'balance_dollars', 'payment_nextDueDate', 'payment_hasPaid', 'payment_minDue_dollars', 'payment_lateFee_dollars', 'createDate']
     const titles = []
 
     for (var i = 0; i < headers.length; i++) {
@@ -13,6 +14,7 @@ function ViewLoanStatus() {
             active: false,
             sorting: false,
             id: headerId[i],
+            maxWidth: maxWidths[i],
             sequence: i
         }
         titles.push(title);
@@ -20,7 +22,7 @@ function ViewLoanStatus() {
 
     return (
         <>
-            <DefaultTable headers={titles} title='Your Loans' url={url} />
+            <DefaultTable headers={titles} title='Your Loans' url={url} errorTitle='LOANSERVICE'/>
         </>
     );
 }

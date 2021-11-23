@@ -20,24 +20,14 @@ function CardSignUp(props) {
     const actionContext = useContext(ActionContext);
     const authContext = useContext(AuthContext);
 
-    const [cardId, setCardId] = useState(actionContext.targetId);
-    const [userId, setUserId] = useState(authContext.userId);
+    const cardId = actionContext.targetId;
+    const userId = authContext.userId;
     const [errorMessage, setErrorMessage] = useState();
-    const [emailError, setEmailError] = useState(false);
-    const [firstNameError, setFirstNameError] = useState(false);
-    const [lastNameError, setLastNameError] = useState(false);
-    const [phoneError, setPhoneError] = useState(false);
-    const [dateOfBirthError, setDateOfBirthError] = useState(false);
     const [nicknameError, setNicknameError] = useState(false);
 
-    const emailRef = useRef();
-    const firstNameRef = useRef();
-    const lastNameRef = useRef();
-    const phoneRef = useRef();
-    const dateOfBirthRef = useRef();
     const nicknameRef = useRef();
 
-    const url = 'http://localhost:9001/cards/'
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}`
     const history = useHistory();
 
     /**
@@ -49,32 +39,6 @@ function CardSignUp(props) {
      */
     function formIsValid(form) {
         let isValid = true;
-
-        if (form.phone && !validator.isMobilePhone(form.phone)) {
-            setPhoneError(true);
-            isValid = false;
-        } else {
-            setPhoneError(false);
-        }
-
-        if (form.firstName && !validator.isAlpha(form.firstName)) {
-            setFirstNameError(true);
-            isValid = false;
-        } else {
-            setFirstNameError(false);
-        }
-
-        if (form.lastName && !validator.isAlpha(form.lastName)) {
-            setLastNameError(true);
-            isValid = false;
-        }
-
-        if (form.dateOfBirth && !validator.isDate(form.dateOfBirth)) {
-            setDateOfBirthError(true);
-            isValid = false;
-        } else {
-            setDateOfBirthError(false);
-        }
 
         if (form.nickname && !validator.isAlphanumeric(form.nickname)) {
             setNicknameError(true);
@@ -120,7 +84,7 @@ function CardSignUp(props) {
         if (!formIsValid(applicationData)) return;
 
         try {
-            const response = await axios.post(url + userId, applicationData, {
+            await axios.post(url + '/' + userId, applicationData, {
                 headers: {
                     "Authorization": authContext.token
                 }

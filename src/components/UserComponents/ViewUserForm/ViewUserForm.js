@@ -12,8 +12,9 @@ function ViewUserForm() {
     const handleShow = () => setShow(true);
     const handleClose = () => setShow(false);
     const [errorMessage, setErrorMessage] = useState();
+    const [isDisplayed, setIsDisplayed] = useState(false);
 
-    var [user, setUser] = useState({})
+    const [user, setUser] = useState({})
     const token = authContext.token;
     const userId = authContext.userId;
     const emailRef = useRef();
@@ -24,9 +25,10 @@ function ViewUserForm() {
     const usernameRef = useRef();
     const dateOfBirthRef = useRef();
 
-    const url = 'http://localhost:9001/users/' + userId
+    const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_USER_SERVICE}/` + userId
 
-    useEffect(() =>
+    useEffect(() => {
+        if (!isDisplayed) {
         axios.get(
             url,
             {
@@ -39,21 +41,21 @@ function ViewUserForm() {
             .then((res) => {
                 if (res.statusText === "OK") {
                     console.log('VIEW SUCCESSFUL');
+                    setIsDisplayed(true);
                     setUser(res.data)
                 } else {
                     throw new Error('VIEW UNSUCCESSFUL');
                 }
             }, [])
-            .then((jsonData) => {
-                console.log(jsonData)
-            })
             .catch((e) => {
                 if (e.response === 403) {
                     console.log('VIEW FAILURE: Code 403 (Forbidden). Your login may be expired or your URL may be incorrect.')
                 }
                 console.log('Error message: ', e.message);
-            }), []
-    )
+            }
+            )
+        }
+        }, [user, isDisplayed, token, url])
 
     function submitUpdate(event) {
         if (!event === null) {
