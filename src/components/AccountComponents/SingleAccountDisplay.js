@@ -33,8 +33,6 @@ const SingleAccount = ({ accounts }) => {
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const authContext = useContext(AuthContext);
-    const token = authContext.token;
     const withAmt = useRef();
     const depAmt = useRef();
     const TransferEntity = { amount };
@@ -184,7 +182,6 @@ const SingleAccount = ({ accounts }) => {
         TransferEntity.amount = amount
         const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + account.accountId
         const headers = {
-            'Authorization': token,
             'Content-Type': 'application/json'
         };
         

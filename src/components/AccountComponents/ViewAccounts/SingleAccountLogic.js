@@ -9,9 +9,7 @@ import Pagination from '@material-ui/lab/Pagination';
 const AccountSingle = () => {
     const { id } = useParams();
     const [transactions, setTransactions] = useState()
-    const authContext = useContext(AuthContext);
     const [account, setAccount] = useState({});
-    const token = authContext.token;
     const [pageNumber, setPageNumber] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState();
     const [pageSize, setPageSize] = useState(5);
@@ -89,7 +87,6 @@ const AccountSingle = () => {
                 url,
                 {
                     headers: {
-                        'Authorization': token,
                         'Content-Type': 'application/json'
                     }
                 })
@@ -114,7 +111,7 @@ const AccountSingle = () => {
                     console.log('Error message: ', e.message + ', code: ' + e.response);
                 })
         }
-    }, [id, url, token, pageNumber, pageSize, searchCriteria, sortOrder, isDirty, loadTransactions]
+    }, [id, url, pageNumber, pageSize, searchCriteria, sortOrder, isDirty, loadTransactions]
  )
 
     return (

@@ -1,7 +1,5 @@
 import { Table, Button } from "react-bootstrap"
 import { Link } from "react-router-dom"
-import AuthContext from "../../../store/auth-context";
-import {useContext} from "react";
 
 /**
  * This function returns a table for displaying a list of cards associated with
@@ -15,7 +13,6 @@ import {useContext} from "react";
  */
 function CardsList(props){
     const cards = props.cards ?? [];
-    const authContext = useContext(AuthContext);
     if (cards.length ===0){
         return null;
     } else {

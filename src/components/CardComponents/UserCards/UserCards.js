@@ -16,7 +16,6 @@ import Pagination from '@material-ui/lab/Pagination';
 function UserCards(){
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
-    const token = authContext.token;
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_CARD_SERVICE}/` + userId + "/all";
     const [cardsList, setCardsList] = useState();
     const [cardsDisplayed, setCardsDisplayed] = useState(false);
@@ -31,7 +30,6 @@ function UserCards(){
         async function getList(){
             const list = await axios.get(url, {
                 headers: {
-                    'Authorization': token,
                     'Content-Type': 'application/json'
                 }
             });
@@ -46,7 +44,7 @@ function UserCards(){
             getList();
         }
 
-    }, [cardsList, cardsDisplayed, token, url]);
+    }, [cardsList, cardsDisplayed, url]);
 
     return(
         <section className={'container'}>
