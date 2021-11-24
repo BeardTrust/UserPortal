@@ -169,7 +169,7 @@ function PaymentCluster(props) {
             console.log('account payment response: ', res)
             console.log('object payment response: ', res2)
         }
-        // window.location.reload();
+        window.location.reload();
     }
 
     function dropHandler(dropInput) {

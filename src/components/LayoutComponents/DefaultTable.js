@@ -493,6 +493,9 @@ const DefaultTable = (props) => {
                         {errorCode === 503 &&
                             <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted.</p>
                         }
+                        {errorCode === 500 &&
+                            <p>A 500 error means the server had an internal problem. We are likely just working on maintinence, and this is not a cause for concern..</p>
+                        }
                         {errorCode === (404 || 405) &&
                             <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
                         }

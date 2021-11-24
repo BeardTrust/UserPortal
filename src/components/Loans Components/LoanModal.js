@@ -53,6 +53,10 @@ function LoanModal(props) {
                         <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(currentLoan.payment.minDue).toString()}></input>
                     </div>
                     <div className="input-group mb-2">
+                        <label id="principalLabel" className="input-group-text">Late Fee Owed:</label>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(currentLoan.payment.lateFee).toString()}></input>
+                    </div>
+                    <div className="input-group mb-2">
                     </div>
                     <div className="input-group mb-2">
                         <label id="nextDueDateLabel" className="input-group-text">Next Payment Due Date:</label>
