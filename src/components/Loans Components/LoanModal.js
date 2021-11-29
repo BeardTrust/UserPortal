@@ -73,7 +73,7 @@ function LoanModal(props) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <TransactionsList assetId={currentLoan.id} loan={currentLoan} search={currentLoan.id} />
+                <TransactionsList assetId={currentLoan.id} />
             </Modal.Footer>
         </section>)
 }

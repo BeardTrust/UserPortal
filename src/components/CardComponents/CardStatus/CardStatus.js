@@ -58,7 +58,7 @@ function CardStatus(props) {
 
             </Modal.Body>
             <Modal.Footer>
-                <TransactionsList object={currentCard.id} assetId={currentCard.id} />
+                <TransactionsList assetId={currentCard.id} />
             </Modal.Footer>
 
         </section>
