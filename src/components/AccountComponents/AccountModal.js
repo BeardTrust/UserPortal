@@ -5,6 +5,14 @@ import AuthContext from "../../store/auth-context"
 import { useState, useContext } from "react"
 import { useHistory } from "react-router-dom"
 
+/**
+ * This is simply a modal fo the user to review an indivodual account
+ *
+ * @author Nathanael Grier <Nathanael.Grier@Smoothstack.com>
+ * @param props.account an account object, containing everything for the modal to display
+ *
+ * @returns {JSX.Element} the page displaying the loan details
+ */
 function AccountModal(props) {
     console.log('account modal rcvd: ', props)
     const [errorMessage, setErrorMessage] = useState();
