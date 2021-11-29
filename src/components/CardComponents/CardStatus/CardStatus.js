@@ -4,6 +4,7 @@ import PaymentCluster from "../../TransactionComponents/PaymentCluster";
 import TransactionsList from "../../TransactionComponents/TransactionsList";
 import { Modal } from "react-bootstrap";
 import { CurrencyValue } from "../../../models/currencyvalue.model";
+
 /**
  * This function returns a page showing the details and status of a
  * single, specified card associated with the currently logged in user.

@@ -7,8 +7,12 @@ import { Button } from "react-bootstrap";
 import { GiPayMoney } from "react-icons/gi"
 import { LoanTransactionModel } from "../../models/loanTransactionModel";
 import { CardTransactionModel } from "../../models/cardtransaction.model"
+
 /**
- * This is simply a modal fo the user to review and pay on an individual loan
+ * This function is simply a few buttons used to make a payment.
+ * It calls a list of all Accounts a user owns so they can select
+ * one as a payment source. It receives props that can be used 
+ * to properly make transactions and send payment requests
  *
  * @author Nathanael Grier <Nathanael.Grier@Smoothstack.com>
  * @param props.object an object to pay on (card or loan)
@@ -57,6 +61,14 @@ function PaymentCluster(props) {
         setCurrentObject(props.object);
     }, [availableAccounts, pay, props.object, getAccounts])
 
+    /**
+     * This function processes transaction requests before allowing a payment request.
+     * It returns the message from transactionservice which allows or blocks tthe payment.
+     * 
+     * @param type The transaction type 
+     * @param amount The transaction amount
+     * @returns 
+     */
     async function processTransaction(type, amount) {
         if (props.transType === 'Loan') {
             console.log('loan transaction model being made...')
@@ -94,12 +106,16 @@ function PaymentCluster(props) {
         }
     }
 
+    /**
+     * This function processes and sends payment requests to the respective services.
+     * It relies on processTransaction() to return a success message before it can execute.
+     * 
+     * @param event The event from the button calling the function 
+     */
     async function makePayment(event) {
         event.preventDefault();
 
         const desiredValue = enteredValue.current.value
-        console.log('desired value: ', desiredValue)
-        console.log('current object: ', props.object)
         setCurrentObject(props.object);
         let d = Math.abs(Math.trunc(parseFloat(desiredValue)))
         let c = Math.abs(Math.trunc(((parseFloat(desiredValue) * 100) % 100)))
@@ -107,25 +123,17 @@ function PaymentCluster(props) {
         if (c < 0) { c *= -1 }
         const cv = new CurrencyValue(true, d, c)
         const objectBalance = new CurrencyValue(currentObject.balance.negative, currentObject.balance.dollars, currentObject.balance.cents)
-        console.log('entered value dollars: ', Math.abs(Math.trunc(parseFloat(desiredValue))))
-        console.log('entered value cents: ', Math.abs(Math.trunc(((parseFloat(desiredValue) * 100) % 100))))
-        console.log('current object: ', objectBalance.toString())
-        console.log('new cv: ', cv.toString())
-
         let confirmPayment = false;
         let canPay = false;
         console.log('current max payment: ', maxPayment)
         if (paymentAccount.balance.negative) {
-            console.log('account negative')
             canPay = false
             setMaxPayment(0);
             console.log('adjusted max payment: ', maxPayment)
         } else {
-            console.log('allowing payment...')
             canPay = true;
         }
         if (desiredValue > maxPayment) {
-            console.log('cv compare to maxpayment equals -1')
             confirmPayment = window.confirm('Attempted to pay with more than available in account!\nWIP: Overdraw?')
             cv.dollars = paymentAccount.balance.dollars;
             cv.cents = paymentAccount.balance.cents
@@ -137,18 +145,13 @@ function PaymentCluster(props) {
             window.alert("There was an error with the amount you entered, please ensure you are using numbers in your input")
         }
         cv.negative = true;
-        console.log('currency value body: ', cv.toString())
-        console.log('payment object set to: ', currentObject)
-        console.log('confirm payment: ', confirmPayment)
-        console.log('canPay: ', canPay)
         var stat
         if (canPay && confirmPayment) {
             stat = await processTransaction('PAYMENT', cv);
-            console.log('transaction status: ', stat)
         }
         if (stat === 'Posted') {
             console.log('canPay true')
-            const res = await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
+            await axios.post((`${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}/` + userId + '/' + paymentAccount.id),
                 cv,
                 {
                     headers: {
@@ -157,7 +160,7 @@ function PaymentCluster(props) {
                     }
                 }
             )
-            const res2 = await axios.post((`${process.env.REACT_APP_BASE_URL}` + props.endpoint),
+            await axios.post((`${process.env.REACT_APP_BASE_URL}` + props.endpoint),
                 cv,
                 {
                     headers: {
@@ -166,19 +169,21 @@ function PaymentCluster(props) {
                     }
                 }
             )
-            console.log('account payment response: ', res)
-            console.log('object payment response: ', res2)
         }
         window.location.reload();
     }
 
+    /**
+     * This function simply sets the current account to make a payment from.
+     * Other related parameters are also set (such as the maximum payment allowed)
+     * 
+     * @param dropInput the account selected
+     */
     function dropHandler(dropInput) {
         setMaxPayment((availableAccounts[dropInput].balance.dollars + (availableAccounts[dropInput].balance.cents / 100)))
         setPaymentAccount(availableAccounts[dropInput])
         console.log('drop handler accessed by: ', dropInput)
         setTitle(availableAccounts[dropInput].nickname + ': ' + CurrencyValue.from(availableAccounts[dropInput].balance).toString())
-        console.log('payment account set to: ', paymentAccount)
-        console.log('max payment set: ', maxPayment)
     }
 
     return (

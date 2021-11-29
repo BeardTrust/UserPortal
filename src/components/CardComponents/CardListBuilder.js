@@ -1,7 +1,15 @@
 import DefaultTable from "../LayoutComponents/DefaultTable";
 import { useContext } from "react";
 import AuthContext from "../../store/auth-context";
-
+/**
+ * This function contains all the props necessary to build 
+ * a table that properly displays BeardTrust Cards.
+ * It sends the props to the Default Table and returns that.
+ * 
+ * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+ * 
+ * @returns {JSX.Element}
+ */
 function ViewCardStatus() {
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;

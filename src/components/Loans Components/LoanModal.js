@@ -4,6 +4,7 @@ import { CurrencyValue } from "../../models/currencyvalue.model";
 import AuthContext from "../../store/auth-context";
 import TransactionsList from "../TransactionComponents/TransactionsList";
 import PaymentCluster from "../TransactionComponents/PaymentCluster";
+
 /**
  * This is simply a modal fo the user to review and pay on an individual loan
  *
