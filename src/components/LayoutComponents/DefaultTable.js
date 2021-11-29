@@ -149,7 +149,6 @@ const DefaultTable = (props) => {
                     setAvailableObjects(res.data);
                     setObjectsDisplayed(true);
                     setNumberOfPages(res.data.totalPages);
-                    setCurrentObject(availableObjects[0]);
                 }
                 if (errorPresent) {
                     setErrorPresent(false)
@@ -229,7 +228,7 @@ const DefaultTable = (props) => {
      * 
      * @author Nathanael Grier <nathanael.grier@smoothstack.com>
      * 
-     * @param props the curreny object to send to the Modal. 
+     * @param props the current object to send to the Modal. 
      */
     function openModal(props) {
         switch (pageTitle) {
@@ -246,7 +245,9 @@ const DefaultTable = (props) => {
             case 'The Loans of BeardTrust':
                 console.log('loan type found')
                 setCurrentObject(props);
-                setShow(true)
+                if (!currentObject.loanType.typeName === undefined) {
+                    setShow(true)
+                }
                 break;
             case 'Your Cards':
                 console.log('card found')

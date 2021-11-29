@@ -1,7 +1,6 @@
-import AuthContext from "../../../store/auth-context";
 import SingleAccount from "../SingleAccountDisplay";
 import { useParams } from "react-router-dom";
-import { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import TransactionsList from "../../TransactionComponents/TransactionsList";
 import Pagination from '@material-ui/lab/Pagination';

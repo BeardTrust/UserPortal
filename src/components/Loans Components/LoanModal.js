@@ -1,5 +1,5 @@
 import { Modal } from "react-bootstrap"
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CurrencyValue } from "../../models/currencyvalue.model";
 import AuthContext from "../../store/auth-context";
 import TransactionsList from "../TransactionComponents/TransactionsList";
@@ -17,7 +17,16 @@ function LoanModal(props) {
     console.log('loan modal props rcvd: ', props)
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
-    const currentLoan = props.loan;
+    const [currentLoan, setCurrentLoan] = useState(props.loan);
+
+    try {
+        const loanType = currentLoan.loanType.typeName
+        console.log('loan type found: ', loanType)
+    } catch (e) {
+        console.log('loan modal error: ', e)
+        setCurrentLoan(props.loan)
+        window.location.reload()
+    }
 
     return (
         <section>

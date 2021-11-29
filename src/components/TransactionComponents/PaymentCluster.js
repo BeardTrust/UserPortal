@@ -187,7 +187,7 @@ function PaymentCluster(props) {
     }
 
     return (
-        <div class="input-group mb-2">
+        <div className="input-group mb-2">
             <label id="paySourceLabel" className="input-group-text mb-2">Source Account:</label>
             <Dropdown onSelect={function (evt) { dropHandler(evt) }} required>
                 <Dropdown.Toggle variant="success" id="dropdown-basic" data-toggle="dropdown">
@@ -195,14 +195,14 @@ function PaymentCluster(props) {
                 </Dropdown.Toggle>
                 <Dropdown.Menu required>
                     {availableAccounts.map((account, index) => (
-                        <Dropdown.Item eventKey={index}>{account.nickname}: {CurrencyValue.from(account.balance).toString()}</Dropdown.Item>
+                        <Dropdown.Item key={index}>{account.nickname}: {CurrencyValue.from(account.balance).toString()}</Dropdown.Item>
                     ))}
-                    <div role="separator" class="dropdown-divider"></div>
+                    <div role="separator" className="dropdown-divider"></div>
                     <Dropdown.Item disabled="true">Select an account to make a payment from</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
             {maxPayment !== null &&
-                <div class="input-group mb-2">
+                <div className="input-group mb-2">
                     <label id="paymentAmountDateLabel" className="input-group-text">Payment Amount:</label>
                     <label id="PayDollarSignLabel" className="input-group-text">$</label>
                     <input className="form-control" type="number" step="0.01" min="0" max={maxPayment} ref={enteredValue} ></input>

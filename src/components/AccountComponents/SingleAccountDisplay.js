@@ -1,6 +1,5 @@
 import { Button, Table, Modal, Alert } from "react-bootstrap"
-import { useContext, useRef, useState } from "react"
-import AuthContext from "../../store/auth-context"
+import { useRef, useState } from "react"
 import Deactivator from "./AccountDeactivation/AccountDeactivator";
 import { useHistory } from "react-router-dom";
 import { useEffect } from "react";
