@@ -13,7 +13,21 @@ import Style from './style.css'
 import CardStatus from "../CardComponents/CardStatus/CardStatus";
 import useWindowDimensions from "./useWindowSize";
 
-
+/**
+ * This function returns the html element for the main table layout
+ * for the application.  This is how it displays almost all user data 
+ * It keeps track of the current innerwidth in order to determine when 
+ * to drop columns from the table in order to better fit on mobile screens
+ * 
+ * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+ *
+ * @param props expexts props.title, props.errorTitle, props.headers, and props.url
+ * @param props.title The title of the page (e.g. Accounts, Loans, Cards, etc.)
+ * @param props.errorTitle The title of the service causing the error (e.g. ACCOUNTSERVICE, CARDSERVICE, LOANSERVICE, etc.)
+ * @param props.headers The custom header information used to build the different tables
+ * @returns {JSX.Element} the html element containing the table
+ * @constructor
+ */
 const DefaultTable = (props) => {
     const authContext = useContext(AuthContext);
     const token = authContext.token;
@@ -210,6 +224,13 @@ const DefaultTable = (props) => {
         }
     }
 
+    /**
+     * This function determines what type of Modal needs to be used to properly display the user's data
+     * 
+     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+     * 
+     * @param props the curreny object to send to the Modal. 
+     */
     function openModal(props) {
         switch (pageTitle) {
             case 'Your Accounts':
@@ -265,6 +286,8 @@ const DefaultTable = (props) => {
     * This function requires no props, as it uses state variables from the containing body.
     * 
     * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    * 
+    * @returns {JSX.Element} the custom buit title headers
     */
     function titleBuilder() {
         const outTitles = []
@@ -287,6 +310,10 @@ const DefaultTable = (props) => {
     * builds rows out of the data,
     * and returns JSX rows for display.
     * This function requires no props, as it uses state variables from the containing body.
+    * 
+    * @author Nathanael Grier <nathanael.grier@smoothstack.com>
+    * 
+    * @returns {JSX.Element} the custom buit rows
     */
     function typeSelector() {
         const rows = []
@@ -492,6 +519,9 @@ const DefaultTable = (props) => {
                         </p>
                         {errorCode === 503 &&
                             <p>A 503 error means service was unavailable. Either our servers are down or your connection was interrupted.</p>
+                        }
+                        {errorCode === 500 &&
+                            <p>A 500 error means the server had an internal problem. We are likely just working on maintinence, and this is not a cause for concern..</p>
                         }
                         {errorCode === (404 || 405) &&
                             <p>404 and 405 errors indicate routing issues. These are very rare, and mean we are likely working on updates.</p>
