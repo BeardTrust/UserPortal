@@ -2,8 +2,11 @@ import { Modal, Button } from "react-bootstrap"
 import { CurrencyValue } from "../../models/currencyvalue.model"
 import TransactionsList from "../TransactionComponents/TransactionsList"
 import AuthContext from "../../store/auth-context"
-import { useState, useContext } from "react"
+import axios from "axios"
+import { useState, useContext, useRef, useEffect } from "react"
 import { useHistory } from "react-router-dom"
+import { GiPayMoney, GiReceiveMoney } from "react-icons/gi"
+import { AccountTransactionModel } from "../../models/accounttransaction.model"
 
 /**
  * This is simply a modal fo the user to review an indivodual account
@@ -17,8 +20,60 @@ function AccountModal(props) {
     console.log('account modal rcvd: ', props)
     const [errorMessage, setErrorMessage] = useState();
     const authContext = useContext(AuthContext);
+    const userId = authContext.userId;
+    const token = authContext.token;
     const currentAccount = props.account;
     const history = useHistory();
+    const [depositing, setDepositing] = useState(false);
+    const [withdrawing, setWithdrawing] = useState(false);
+    const enteredValue = useRef();
+    const [amount, setAmount] = useState();
+    const maxWithdraw = currentAccount.balance.negative ? 0 : (currentAccount.balance.dollars + currentAccount.balance.cents / 100);
+    console.log('max withdraw set: ', maxWithdraw)
+
+    useEffect(() => {
+        console.log('use effect called, amount: ', amount)
+        if (amount !== undefined) {
+            console.log('use effect calling payment')
+            processTransaction()
+        }
+    }, [amount])
+
+    function handleAmount(props) {
+        console.log('props received: ', props)
+        const c = CurrencyValue.valueOf(enteredValue.current.value)
+        c.negative = props
+        console.log('value made: ', c.toString())
+        setAmount(c);
+    }
+
+    async function processTransaction() {
+        console.log('handle payment call')
+        var type = amount.negative ? 'WITHDRAW' : 'DEPOSIT'
+        var targetId = amount.negative ? "Withdraw" : currentAccount.id;
+        var sourceId = amount.negative ? currentAccount.id : "Deposit";
+        console.log('payment amount: ', amount)
+        console.log('account transaction model being made...')
+        const t = new AccountTransactionModel('', type, 'ACCOUNT', amount, 'PENDING', sourceId, targetId, Date.now(), "A " + type.toLowerCase() + " to your " + currentAccount.type.name + " account with an amount of " + amount)
+        console.log('transaction made: ', t)
+        const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}`
+        const res = await axios.post((url),
+            t,
+            {
+                headers: {
+                    'Authorization': token,
+                    'Content-Type': 'application/json'
+                }
+            }
+        )
+        console.log('transaction response: ', res)
+        console.log('amount: ', amount)
+        return res.data.transactionStatus.statusName
+    }
+
+    async function makePayment(props) {
+        
+    }
 
 
     return (
@@ -53,21 +108,68 @@ function AccountModal(props) {
                         <input id="createDateText" className="form-control" type="text" disabled={true} value={currentAccount.createDate.slice(8, 10) + '/' + currentAccount.createDate.slice(5, 7) + '/' + currentAccount.createDate.slice(0, 4)}></input>
                     </div>
                 </div>
-                <TransactionsList assetId={currentAccount.id} />
+                <div>
+                    {!depositing &&
+                        <Button
+                            variant="primary"
+                            onClick={(event) => {
+                                event.preventDefault();
+                                setDepositing(true)
+                                // if (authContext.userIsLoggedIn) {
+                                //     setErrorMessage("Deposit not implemented yet...")
+                                // } else {
+                                //     history.push('/auth');
+                                // }
+                            }}>
+                            Deposit
+                        </Button>
+                    }
+                    {depositing &&
+                        <div className="input-group mb-2">
+                            <label id="paymentAmountDateLabel" className="input-group-text">Deposit Amount:</label>
+                            <label id="PayDollarSignLabel" className="input-group-text">$</label>
+                            <input className="form-control" type="number" step="0.01" max="999999999999999999999" min="0" ref={enteredValue} ></input>
+                            <Button variant="primary" onClick={() => {
+                                setDepositing(false)
+                                handleAmount(false);
+                            }}>
+                                Confirm Deposit <GiPayMoney />
+                            </Button>
+                        </div>
+                    }
+                </div>
+                <div>
+                    {!withdrawing &&
+                        <Button
+                            variant="danger"
+                            onClick={(event) => {
+                                event.preventDefault();
+                                if (maxWithdraw === 0) {
+                                    setErrorMessage("Cannot withdraw from an account with a balance of 0 or below")
+                                } else {
+                                    setWithdrawing(true);
+                                }
+                            }}>
+                            Withdraw
+                        </Button>
+                    }
+                    {withdrawing &&
+                        <div className="input-group mb-2">
+                            <label id="paymentAmountDateLabel" className="input-group-text">Withdraw Amount:</label>
+                            <label id="PayDollarSignLabel" className="input-group-text">$</label>
+                            <input className="form-control" type="number" step="0.01" max={maxWithdraw} min="0" ref={enteredValue} ></input>
+                            <Button variant="primary" onClick={() => {
+                                setWithdrawing(false);
+                                handleAmount(true);
+                            }}>
+                                Confirm Withdrawl <GiReceiveMoney />
+                            </Button>
+                        </div>
+                    }
+                </div>
             </Modal.Body>
             <Modal.Footer>
-                <Button
-                    variant="primary"
-                    onClick={(event) => {
-                        event.preventDefault();
-                        if (authContext.userIsLoggedIn) {
-                            setErrorMessage("Payments not implemented yet...")
-                        } else {
-                            history.push('/auth');
-                        }
-                    }}>
-                    Payment Features Here
-                </Button>
+                <TransactionsList assetId={currentAccount.id} />
             </Modal.Footer>
         </section>)
 }

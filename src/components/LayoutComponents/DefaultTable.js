@@ -149,6 +149,9 @@ const DefaultTable = (props) => {
                     setAvailableObjects(res.data);
                     setObjectsDisplayed(true);
                     setNumberOfPages(res.data.totalPages);
+                    if (pageTitle === 'The Loans of BeardTrust') {
+                        setCurrentObject(availableObjects[0])
+                    }
                 }
                 if (errorPresent) {
                     setErrorPresent(false)
@@ -171,7 +174,7 @@ const DefaultTable = (props) => {
                 }
             })
     },
-        [availableObjects, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, errorPresent, url, userId],
+        [availableObjects, pageTitle, searchCriteriaChanged, token, pageSize, currentPage, searchCriteria, sortBy, errorPresent, url, userId],
     )
 
     useEffect(() => {
@@ -245,9 +248,8 @@ const DefaultTable = (props) => {
             case 'The Loans of BeardTrust':
                 console.log('loan type found')
                 setCurrentObject(props);
-                if (!currentObject.loanType.typeName === undefined) {
                     setShow(true)
-                }
+                
                 break;
             case 'Your Cards':
                 console.log('card found')

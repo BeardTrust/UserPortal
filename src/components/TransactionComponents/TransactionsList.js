@@ -18,6 +18,7 @@ function TransactionsList(props) {
     const authContext = useContext(AuthContext);
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${props.assetId}`;
     const pageSizes = [1, 5, 10, 15, 20, 25, 50];
+    const [errorMessage, setErrorMessage] = useState();
     const [modified, setModified] = useState(true);
     const [transactions, setTransactions] = useState();
     const [pageSize, setPageSize] = useState(5);
@@ -31,7 +32,6 @@ function TransactionsList(props) {
     const [sortByStatus, setSortByStatus] = useState({ active: false, name: 'transactionStatus', direction: 'asc' });
 
     const getTransactions = useCallback(async () => {
-        console.log("Effect called. Outbound url: ", url);
         setModified(false);
             setCurrentPage(0);
         
@@ -46,11 +46,16 @@ function TransactionsList(props) {
             headers: {
                 "Authorization": authContext.token
             }
+        }).then ((res) => {
+            console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
+        setTransactions(res.data.content);
+        setNumberOfPages(res.data.totalPages);
+        console.log(res);
+        })
+        .catch((e) =>  {
+            console.log('error: ', e.response)
+            setErrorMessage("Error getting Transactions: " + e.response.status + ' ' + e.response.statusText)
         });
-        console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
-        setTransactions(content.data.content);
-        setNumberOfPages(content.data.totalPages);
-        console.log(content);
     }, [authContext.token, currentPage, pageSize, searchCriteria, sortBy, url])
     
     const getList = useCallback( async () => 
@@ -237,6 +242,7 @@ function TransactionsList(props) {
                     </div>
                 </div>
                 <div>
+                {errorMessage && <div className={'alert-danger mt-5'}>{errorMessage}</div>}
                     <Table striped bordered hover className={'me-3 table-responsive'} data-sortable={'true'}
                         data-toggle={'table'} id={'table'}>
                         <thead>
@@ -280,7 +286,7 @@ function TransactionsList(props) {
                             ))}
                         </tbody>
                     </Table>
-                    {transactions === undefined &&
+                    {transactions === undefined && !errorMessage &&
                         <div className="input-Group">
                             <label className="input-group-text" >Transactions loading...</label>
                         </div>
