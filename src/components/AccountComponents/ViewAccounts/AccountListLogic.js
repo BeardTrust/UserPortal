@@ -8,7 +8,6 @@ function ViewAccount() {
     const authContext = useContext(AuthContext);
 
     var [actAry, setAccount] = useState({})
-    const token = authContext.token;
     const userId = authContext.userId;
 
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_ACCOUNT_SERVICE}`
@@ -20,7 +19,6 @@ function ViewAccount() {
                 method: 'GET',
                 params: { id: userId },
                 headers: {
-                    'Authorization': token,
                     'Content-Type': 'application/json'
                 }
             })
@@ -40,7 +38,7 @@ function ViewAccount() {
                     console.log('VIEW FAILURE: Code 403 (Forbidden). Your login may be expired or your URL may be incorrect.')
                 }
                 console.log('Error message: ', e.message + ', code: ' + e.response);
-            }), [token, userId])
+            }), [userId])
 
         return (
             <section className="container">

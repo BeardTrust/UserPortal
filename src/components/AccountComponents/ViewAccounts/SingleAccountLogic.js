@@ -1,7 +1,6 @@
-import AuthContext from "../../../store/auth-context";
 import SingleAccount from "../SingleAccountDisplay";
 import { useParams } from "react-router-dom";
-import { useEffect, useContext, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import TransactionsList from "../../TransactionComponents/TransactionsList";
 import Pagination from '@material-ui/lab/Pagination';
@@ -9,9 +8,7 @@ import Pagination from '@material-ui/lab/Pagination';
 const AccountSingle = () => {
     const { id } = useParams();
     const [transactions, setTransactions] = useState()
-    const authContext = useContext(AuthContext);
     const [account, setAccount] = useState({});
-    const token = authContext.token;
     const [pageNumber, setPageNumber] = useState(0);
     const [numberOfPages, setNumberOfPages] = useState();
     const [pageSize, setPageSize] = useState(5);
@@ -89,7 +86,6 @@ const AccountSingle = () => {
                 url,
                 {
                     headers: {
-                        'Authorization': token,
                         'Content-Type': 'application/json'
                     }
                 })
@@ -114,7 +110,7 @@ const AccountSingle = () => {
                     console.log('Error message: ', e.message + ', code: ' + e.response);
                 })
         }
-    }, [id, url, token, pageNumber, pageSize, searchCriteria, sortOrder, isDirty, loadTransactions]
+    }, [id, url, pageNumber, pageSize, searchCriteria, sortOrder, isDirty, loadTransactions]
  )
 
     return (

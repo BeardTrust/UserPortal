@@ -6,6 +6,13 @@ import Pagination from '@material-ui/lab/Pagination';
 import { FcRefresh, FcSearch } from "react-icons/fc";
 import axios from "axios";
 
+/**
+ * This function returns a sortable table listing the transactions involved with the inbound asset
+ *
+ * @param props.assetId The asset to get transactions of
+ *
+ * @returns {JSX.Element} The table containing the list of transactions
+ */
 function TransactionsList(props) {
     console.log('transaction list props rcvd: ', props)
     const authContext = useContext(AuthContext);

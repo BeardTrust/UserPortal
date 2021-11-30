@@ -5,6 +5,12 @@ import AuthContext from "../../../store/auth-context"
 import { useContext } from "react"
 import { Button, Modal, FormLabel, FormControl } from "react-bootstrap"
 
+/**
+ * This function gets the current logged in user and displays their information on screen.
+ * There are also update features built in for the user to update their personal information
+ * 
+ * @returns {JSX.Element}
+ */
 function ViewUserForm() {
 
     const authContext = useContext(AuthContext);
@@ -57,6 +63,13 @@ function ViewUserForm() {
         }
         }, [user, isDisplayed, token, url])
 
+        /**
+         * This function reads any updated info and sends it to the service in order to save the update.
+         * 
+         * @param event the event calling the function 
+         * 
+         * @returns {JSX.Element}
+         */
     function submitUpdate(event) {
         if (!event === null) {
             event.preventDefault();
@@ -130,6 +143,7 @@ function ViewUserForm() {
         });
         window.location.reload();
     }
+
     return (
         <section className={'container'}>
             <div className={'mt-5'}>

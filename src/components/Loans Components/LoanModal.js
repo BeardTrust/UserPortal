@@ -1,9 +1,10 @@
 import { Modal } from "react-bootstrap"
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CurrencyValue } from "../../models/currencyvalue.model";
 import AuthContext from "../../store/auth-context";
 import TransactionsList from "../TransactionComponents/TransactionsList";
 import PaymentCluster from "../TransactionComponents/PaymentCluster";
+
 /**
  * This is simply a modal fo the user to review and pay on an individual loan
  *
@@ -16,7 +17,16 @@ function LoanModal(props) {
     console.log('loan modal props rcvd: ', props)
     const authContext = useContext(AuthContext);
     const userId = authContext.userId;
-    const currentLoan = props.loan;
+    const [currentLoan, setCurrentLoan] = useState(props.loan);
+
+    try {
+        const loanType = currentLoan.loanType.typeName
+        console.log('loan type found: ', loanType)
+    } catch (e) {
+        console.log('loan modal error: ', e)
+        setCurrentLoan(props.loan)
+        window.location.reload()
+    }
 
     return (
         <section>
@@ -53,6 +63,10 @@ function LoanModal(props) {
                         <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(currentLoan.payment.minDue).toString()}></input>
                     </div>
                     <div className="input-group mb-2">
+                        <label id="principalLabel" className="input-group-text">Late Fee Owed:</label>
+                        <input id="principalText" className="form-control" type="text" disabled={true} value={CurrencyValue.from(currentLoan.payment.lateFee).toString()}></input>
+                    </div>
+                    <div className="input-group mb-2">
                     </div>
                     <div className="input-group mb-2">
                         <label id="nextDueDateLabel" className="input-group-text">Next Payment Due Date:</label>
@@ -68,7 +82,7 @@ function LoanModal(props) {
                 </div>
             </Modal.Body>
             <Modal.Footer>
-                <TransactionsList assetId={currentLoan.id} loan={currentLoan} search={currentLoan.id} />
+                <TransactionsList assetId={currentLoan.id} />
             </Modal.Footer>
         </section>)
 }
