@@ -102,18 +102,18 @@ function MainNavigation(props) {
                             </li>
                             {authContext.userIsLoggedIn &&
                                 <NavDropdown title="Accounts">
-                                    <Link className={'nav-link dropdown-item'} to="/accounts">Apply for Account</Link>
-                                    <Link className={'nav-link dropdown-item'} to="/accounts/me">My Accounts</Link>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/accounts">Apply for Account</NavDropdown.Item>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/accounts/me">My Accounts</NavDropdown.Item>
                                 </NavDropdown>}
                             {authContext.userIsLoggedIn &&
                                 <NavDropdown title="Cards">
-                                    <Link className={'nav-link dropdown-item'} to="/cardoffers">Apply for Card</Link>
-                                    <Link className={'nav-link dropdown-item'} to="/cards">My Cards</Link>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/cardoffers">Apply for Card</NavDropdown.Item>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/cards">My Cards</NavDropdown.Item>
                                 </NavDropdown>}
                             {authContext.userIsLoggedIn &&
                                 <NavDropdown title="Loans">
-                                    <Link className={'nav-link dropdown-item'} to="/loanoffers">Apply for Loan</Link>
-                                    <Link className={'nav-link dropdown-item'} to="/myloans">My Loans</Link>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/loanoffers">Apply for Loan</NavDropdown.Item>
+                                    <NavDropdown.Item className={'nav-link dropdown-item'} href="/myloans">My Loans</NavDropdown.Item>
                                 </NavDropdown>}
                             <li className="nav-item">
                                 {!authContext.userIsLoggedIn && <Link className={'nav-link'} to={'/auth'}>Log In</Link>}
