@@ -23,7 +23,7 @@ function TransactionsList(props) {
     const [transactions, setTransactions] = useState();
     const [pageSize, setPageSize] = useState(5);
     const [sortBy, setSortBy] = useState('statusTime,asc');
-    const [searchCriteria, setSearchCriteria] = useState();
+    const [searchCriteria, setSearchCriteria] = useState("");
     const [numberOfPages, setNumberOfPages] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortByDate, setSortByDate] = useState({ active: false, name: 'statusTime', direction: 'asc' });
@@ -33,10 +33,9 @@ function TransactionsList(props) {
 
     const getTransactions = useCallback(async () => {
         setModified(false);
-            setCurrentPage(0);
         
 
-        let content = await axios.get(url, {
+        await axios.get(url, {
             params: {
                 page: currentPage === 0 ? 0 : currentPage - 1,
                 size: pageSize,
@@ -98,6 +97,9 @@ function TransactionsList(props) {
     }
 
     function resetSearch() {
+        console.log('transaction reset search')
+        setCurrentPage(1);
+        setModified(true);
         deactivateSortParams();
         setSortBy('statusTime,asc');
         setSearchCriteria("");
@@ -128,7 +130,7 @@ function TransactionsList(props) {
     }
 
     function handlePageChange(event, value) {
-        console.log('setting current page...')
+        console.log('setting current page...', value)
         setCurrentPage(value);
         setModified(true);
     }
