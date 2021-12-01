@@ -6,7 +6,6 @@ import LoginForm from "./components/AuthComponents/LoginForm/LoginForm";
 import ViewUserForm from './components/UserComponents/ViewUserForm/ViewUserForm';
 import AccountRegistration from './components/AccountComponents/RegisterAccount/AccountRegistry';
 import ViewAccount from './components/AccountComponents/AccountListBuilder';
-import AccountSingle from './components/AccountComponents/ViewAccounts/SingleAccountLogic';
 import AccountDeactivator from './components/AccountComponents/AccountDeactivation/AccountDeactivator'
 import Layout from './components/LayoutComponents/PageLayout/Layout';
 import CardSignUp from './components/CardComponents/CardSignUp/CardSignUp'
@@ -40,11 +39,6 @@ function App() {
                 <Route path={'/accounts/deactivate'}>
                     <Layout>
                         {authContext.userIsLoggedIn && <AccountDeactivator />}
-                    </Layout>
-                </Route>
-                <Route path={'/accounts/single/:id'}>
-                    <Layout>
-                        {authContext.userIsLoggedIn && <AccountSingle/>}
                     </Layout>
                 </Route>
                 <Route path={'/accounts/me'}>

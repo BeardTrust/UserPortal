@@ -18,11 +18,12 @@ function TransactionsList(props) {
     const authContext = useContext(AuthContext);
     const url = `${process.env.REACT_APP_BASE_URL}${process.env.REACT_APP_TRANSACTIONS_ENDPOINT}/${props.assetId}`;
     const pageSizes = [1, 5, 10, 15, 20, 25, 50];
+    const [errorMessage, setErrorMessage] = useState();
     const [modified, setModified] = useState(true);
     const [transactions, setTransactions] = useState();
     const [pageSize, setPageSize] = useState(5);
     const [sortBy, setSortBy] = useState('statusTime,asc');
-    const [searchCriteria, setSearchCriteria] = useState();
+    const [searchCriteria, setSearchCriteria] = useState("");
     const [numberOfPages, setNumberOfPages] = useState(10);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortByDate, setSortByDate] = useState({ active: false, name: 'statusTime', direction: 'asc' });
@@ -31,12 +32,10 @@ function TransactionsList(props) {
     const [sortByStatus, setSortByStatus] = useState({ active: false, name: 'transactionStatus', direction: 'asc' });
 
     const getTransactions = useCallback(async () => {
-        console.log("Effect called. Outbound url: ", url);
         setModified(false);
-            setCurrentPage(0);
         
 
-        let content = await axios.get(url, {
+        await axios.get(url, {
             params: {
                 page: currentPage === 0 ? 0 : currentPage - 1,
                 size: pageSize,
@@ -46,11 +45,16 @@ function TransactionsList(props) {
             headers: {
                 "Authorization": authContext.token
             }
+        }).then ((res) => {
+            console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
+        setTransactions(res.data.content);
+        setNumberOfPages(res.data.totalPages);
+        console.log(res);
+        })
+        .catch((e) =>  {
+            console.log('error: ', e.response)
+            setErrorMessage("Error getting Transactions: " + e.response.status + ' ' + e.response.statusText)
         });
-        console.log('outbound page: ', currentPage, ". outbound size: ", pageSize)
-        setTransactions(content.data.content);
-        setNumberOfPages(content.data.totalPages);
-        console.log(content);
     }, [authContext.token, currentPage, pageSize, searchCriteria, sortBy, url])
     
     const getList = useCallback( async () => 
@@ -93,6 +97,9 @@ function TransactionsList(props) {
     }
 
     function resetSearch() {
+        console.log('transaction reset search')
+        setCurrentPage(1);
+        setModified(true);
         deactivateSortParams();
         setSortBy('statusTime,asc');
         setSearchCriteria("");
@@ -123,7 +130,7 @@ function TransactionsList(props) {
     }
 
     function handlePageChange(event, value) {
-        console.log('setting current page...')
+        console.log('setting current page...', value)
         setCurrentPage(value);
         setModified(true);
     }
@@ -237,6 +244,7 @@ function TransactionsList(props) {
                     </div>
                 </div>
                 <div>
+                {errorMessage && <div className={'alert-danger mt-5'}>{errorMessage}</div>}
                     <Table striped bordered hover className={'me-3 table-responsive'} data-sortable={'true'}
                         data-toggle={'table'} id={'table'}>
                         <thead>
@@ -280,7 +288,7 @@ function TransactionsList(props) {
                             ))}
                         </tbody>
                     </Table>
-                    {transactions === undefined &&
+                    {transactions === undefined && !errorMessage &&
                         <div className="input-Group">
                             <label className="input-group-text" >Transactions loading...</label>
                         </div>
