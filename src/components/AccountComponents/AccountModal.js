@@ -101,7 +101,7 @@ function AccountModal(props) {
         }
         if (res.data.transactionStatus.statusName === 'Declined') {
             console.log('transaction declined...')
-            setErrorMessage('Error creating Transaction: amount was declined')
+            setErrorMessage('Cannot process payment: transaction amount was declined')
         }
     })
     .catch((e) =>  {
